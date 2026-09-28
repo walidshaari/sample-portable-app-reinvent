@@ -157,7 +157,7 @@ container digest matches the locally built image</code></pre></div>
     </svg>
     <figcaption>Matching image bytes establish application portability. They do not establish shared state, regional failover, or policy compliance.</figcaption>
   </figure>
-  <p>kind and EKS are both Kubernetes. This is placement portability within one compute model, not proof that every compute model runs the same image. The optional Lambda lane uses Lambda Web Adapter and a derived image; it needs a separate proof.</p>
+  <p>kind and EKS are both Kubernetes. This is placement portability within one compute model. A Lambda integration would need its own packaging and runtime proof; the EKS/kind image digest cannot establish that claim.</p>
   <p class="micro">The published source has the same core and PostgreSQL adapter bytes as the rehearsal checkout. It uses a smaller package, so its image digest must be established with a new build and deployment before repeating the live equality claim.</p>
   <div class="ribbon">Placement is an architectural option. Resilience and residency become credible only when data, traffic, recovery, access, and evidence are designed for that option.</div>
 </section>
