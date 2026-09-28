@@ -151,7 +151,7 @@ These captioned replays have no voiceover. They summarize local tests and dated 
 
 ### Four terminal walkthroughs
 
-The deployment and adapter sections contain dated rehearsal captures. The share versions use a synthetic system voice. Silent stage versions and narration text are available on the [visual article](https://walidshaari.github.io/sample-portable-app-reinvent/).
+The deployment and adapter sections contain dated rehearsal captures. The share versions use a synthetic system voice. Silent stage versions and narration text are available on the [visual article](https://walidshaari.github.io/sample-portable-app-reinvent/arc401/).
 
 | Walkthrough | Narrated video |
 | --- | --- |
