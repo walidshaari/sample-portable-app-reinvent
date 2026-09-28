@@ -52,6 +52,7 @@
     .chip{display:inline-block;border:1px solid var(--line);border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.08em;padding:3px 8px;margin-bottom:10px}
     .chip.orange{border-color:#e6ac80;color:#a43e00;background:var(--orange-pale)}
     .chip.green{border-color:#9bc3b3;color:var(--green);background:#ebf5ef}
+    .decisions{padding-left:23px;margin:18px 0 22px}.decisions li{margin:0 0 10px}
     .proof{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}
     .proof>div{padding:17px 18px;border:1px solid var(--line);background:var(--white)}.proof b{display:block;font-size:15px}.proof p{font-size:14px;margin:7px 0 0}
     .proof .need{border-top:3px solid var(--orange)}.proof .shown{border-top:3px solid var(--green)}
@@ -94,10 +95,12 @@
         <span class="key">raise</span> HTTPException(status_code=404, detail=<span class="str">"User not found"</span>)
     <span class="key">return</span> user</code></pre></div>
   <p>The problem grows with agent-generated changes: a plausible local edit can spread a platform choice through many files. A readable boundary gives a human reviewer and an assistant a smaller place to look.</p>
+  <p><strong>When to skip the pattern:</strong> A short-lived prototype with one owner may not need these extra files. Start with one port when an action must survive a change in storage, entry point, or team.</p>
 </section>
 <section id="boundary">
   <p class="beat">02 · The design</p><h2>Make the dependency direction visible.</h2>
-  <p>The HTTP edge accepts a request. A use case performs the action through a small port. At startup, the composition root supplies the adapter. The database call happens outward; the use case imports only the port.</p>
+  <p>A use case holds the business action, and a port names the behavior it needs. An adapter calls an external system; the composition root connects that adapter at startup. The database call stays outside the use case.</p>
+  <p>Follow the arrows in the figure: which part owns the database choice?</p>
   <figure class="figure">
     <svg viewBox="0 0 1000 300" role="img" aria-labelledby="boundary-title boundary-desc">
       <title id="boundary-title">Request flow and code dependency across the clean architecture boundary</title>
@@ -127,11 +130,16 @@
         <span class="key">await</span> self._user_repository.create(user)
         <span class="key">return</span> user</code></pre></div>
   <p>The port promises <code>create</code>, <code>find_by_id</code>, <code>find_all</code>, and <code>delete</code>. The registry in <code>infrastructure/composition.py</code> selects <code>memory</code>, <code>dynamodb</code>, or <code>postgres</code> from configuration. This is an explicit extension point, not a promise that every future data model will fit it.</p>
-  <p>The entity also checks input types before using string operations. A missing email or numeric name raises <code>ValueError</code>; the HTTP edge translates that error to 400. Entity and HTTP tests cover both outcomes in the <a href="https://github.com/walidshaari/sample-portable-app-reinvent/tree/b9ef30a2e7d73311f12a6e3e2360c1a21f9214c8/base_python/clean/tests">public source</a>. The <a href="evidence/captures/10-input-validation-2026-09-28.txt">28 September capture from the rehearsal build</a> shows HTTP 400 for both requests on EKS and kind. The rule stays usable outside HTTP and makes malformed input easier to diagnose.</p>
+  <p>The entity also checks input types before using string operations. A missing email or numeric name raises <code>ValueError</code>; the HTTP edge translates that error to 400. Entity and HTTP tests cover both outcomes in the <a href="https://github.com/walidshaari/sample-portable-app-reinvent/tree/b9ef30a2e7d73311f12a6e3e2360c1a21f9214c8/base_python/clean/tests">public source</a>. The <a href="evidence/captures/10-input-validation-2026-09-28.txt">28 September capture from the rehearsal build</a> shows HTTP 400 for both requests on EKS and kind. A CLI command or queue consumer can use the same entity rule without importing FastAPI.</p>
 </section>
 <section id="placements">
   <p class="beat">03 · The placement proof</p><h2>One image. Two deployments. Separate data.</h2>
-  <p>The stage proof is <a href="https://github.com/walidshaari/sample-portable-app-reinvent/blob/b9ef30a2e7d73311f12a6e3e2360c1a21f9214c8/demo/09-two-targets.sh"><code>demo/09-two-targets.sh</code></a>. When run, it checks each runtime label, store readiness, a core fingerprint matching the checkout, and pod image digests matching each other and the locally built image. The 28 September recording shows this result for the rehearsal build. The two clusters have different configuration, identities, and stores.</p>
+  <p>The terminal walkthrough below replays the read-only <a href="https://github.com/walidshaari/sample-portable-app-reinvent/blob/b9ef30a2e7d73311f12a6e3e2360c1a21f9214c8/demo/09-two-targets.sh"><code>demo/09-two-targets.sh</code></a> audit. It checks runtime labels, store readiness, a core fingerprint matching the checkout, and pod digests matching each other and the locally built image. It stops on a mismatch. The 28 September recording documents the rehearsal build. The public package needs a new digest proof.</p>
+  <div class="codebox"><div class="codehead"><span>28 Sep 2026 rehearsal capture · running pod image IDs</span><span>matched</span></div><pre><code>EKS   sha256:185f46d5fb5e59cbe8240dfcf091b4bd3f5d21b5a3d0ed65c4af5652ff40e8f9
+kind  sha256:185f46d5fb5e59cbe8240dfcf091b4bd3f5d21b5a3d0ed65c4af5652ff40e8f9
+one container digest on both clusters
+container digest matches the locally built image</code></pre></div>
+  <p>The paired digest lines answer whether the pods match. The diagram answers what differs around them.</p>
   <figure class="figure">
     <svg viewBox="0 0 1000 380" role="img" aria-labelledby="place-title place-desc">
       <title id="place-title">The same application image in EKS and kind with separate stores</title>
@@ -149,6 +157,7 @@
     </svg>
     <figcaption>Matching image bytes establish application portability. They do not establish shared state, regional failover, or policy compliance.</figcaption>
   </figure>
+  <p>kind and EKS are both Kubernetes. This is placement portability within one compute model, not proof that every compute model runs the same image. The optional Lambda lane uses Lambda Web Adapter and a derived image; it needs a separate proof.</p>
   <p class="micro">The published source has the same core and PostgreSQL adapter bytes as the rehearsal checkout. It uses a smaller package, so its image digest must be established with a new build and deployment before repeating the live equality claim.</p>
   <div class="ribbon">Placement is an architectural option. Resilience and residency become credible only when data, traffic, recovery, access, and evidence are designed for that option.</div>
 </section>
@@ -158,20 +167,22 @@
     <tr><td>Same PostgreSQL API, different placement</td><td>Deployment settings and credentials; existing adapter remains</td><td>Network, secrets, operations, data movement</td></tr>
     <tr><td>DynamoDB model → PostgreSQL model</td><td>New adapter and one registry entry; core remains</td><td>Behavioral contract, schema, migration, cutover</td></tr>
   </tbody></table>
-  <p>In the PostgreSQL adapter, <code>create()</code> uses <code>INSERT ... ON CONFLICT DO UPDATE</code> to preserve the port’s overwrite behavior. It intentionally adds no foreign key for <code>orders.user_id</code>, because the existing domain accepts an order for an unknown user. These data-model decisions belong in the adapter.</p>
+  <p>Two adapter decisions preserve the existing behavior:</p>
+  <ul class="decisions"><li><code>create()</code> uses <code>INSERT ... ON CONFLICT DO UPDATE</code> to keep the port’s overwrite behavior.</li><li>The schema omits a foreign key for <code>orders.user_id</code> because the domain accepts an order for an unknown user. An adapter must not introduce a new business rule.</li></ul>
   <div class="codebox"><div class="codehead"><span>base_python/clean/infrastructure/composition.py · lines 39-43</span><span>technology registry</span></div><pre><code>BACKENDS: Dict[str, str] = {
     <span class="str">"memory"</span>: <span class="str">"infrastructure.repositories.in_memory_backend:build"</span>,
     <span class="str">"dynamodb"</span>: <span class="str">"infrastructure.repositories.dynamodb_backend:build"</span>,
     <span class="str">"postgres"</span>: <span class="str">"infrastructure.repositories.postgres_repositories:build"</span>,
 }</code></pre></div>
   <p>The prepared <code>demo/04-tech-axis.sh</code> replays this adapter addition and runs the same repository contract against each implementation. Label it as a patch replay on stage; it is not a spontaneous migration.</p>
+  <p>The sample migration job creates tables with <code>CREATE TABLE IF NOT EXISTS</code>. It does not version schema changes or move records between databases. A real cutover needs a backfill, verification, a write strategy, and rollback steps.</p>
 </section>
 <section id="agents">
   <p class="beat">05 · Agent-assisted change</p><h2>Give agents a map, then test the boundary.</h2>
-  <p>Clean names and small ports help an assistant locate the intended change. Kiro steering explains the dependency rule. Skills give repeatable tasks. An MCP server exposes architecture checks. The PreToolUse hook checks a proposed write and blocks an SDK import into the domain with <code>AG001</code> and exit code <code>2</code>.</p>
+  <p>Clean names and small ports help an assistant locate the intended change. Kiro steering explains the dependency rule. Skills give repeatable tasks. An MCP server exposes architecture checks. In an IDE session, Kiro invokes the configured PreToolUse hook before an agent tool edit is applied. The hook can block an SDK import into the domain with <code>AG001</code> and exit code <code>2</code>.</p>
   <div class="compare"><div><span class="chip orange">PROPOSED SHORTCUT</span><h3><code>domain/user.py</code> imports <code>boto3</code></h3><p>The agent reaches from a business entity into the storage SDK. The hook rejects that proposed edit before it is written.</p></div><div><span class="chip green">REPAIR PATH</span><h3>Port → adapter → composition</h3><p>State the operation the use case needs, implement it outside the core, inject it, then run the shared contract.</p></div></div>
   <p>This improves change review and troubleshooting: a failing entity rule, contract test, adapter, and HTTP response have distinct owners. Teams can adopt it one action at a time: extract one action and one port before refactoring the whole app. No layout guarantees a correct agent answer; tests and review remain part of the loop.</p>
-  <p class="micro">The demo hook is a deterministic replay of a Kiro tool payload. Hook coverage depends on how edits are made. The git hook and CI template must be installed and enabled in a target repository; the architecture checker’s parse warnings call for a separate syntax or test gate.</p>
+  <p class="micro">The on-stage command replays a Kiro tool payload locally. Hook coverage depends on how edits are made. The separate git hook and CI template must be installed and enabled in a target repository; the architecture checker’s parse warnings call for a separate syntax or test gate.</p>
 </section>
 <section id="claims">
   <p class="beat">06 · Claim discipline</p><h2>Say exactly what the evidence supports.</h2>
@@ -183,7 +194,7 @@
   <p>For the 40-minute session, spend 10 minutes on the tax, core, and two axes. Use 25 minutes to trace one request, show the EKS/kind proof, flip Region persistence, replay the adapter addition, and reject the agent shortcut. Reserve five minutes for Q&amp;A. Keep the two-target proof, adapter contract, and guard rejection if time runs short.</p>
   <p>Ask a colleague to explain the two deployment diagram without your narration. If they say “automatic failover” or “compliant residency,” revise the line you used. The rehearsal succeeds when a listener can say what stayed fixed, what changed, and what is still unproved.</p>
   <h3>Four short evidence replays</h3>
-  <p>These four short videos replay evidence with captions and no voiceover. They are illustrated summaries of the tests and dated two-target capture. The <a href="recordings/_renders/manifest.json">evidence manifest</a> gives their sources and dates.</p>
+  <p>Which proof can a viewer locate in twenty seconds? These captioned replays trace the request, pair the Region and laptop digest checks, distinguish the two change axes, and show the guard rejection. The <a href="recordings/_renders/manifest.json">evidence manifest</a> gives their sources and dates.</p>
   <div class="filmstrip">
     <div><video controls preload="metadata" poster="recordings/_renders/01-request-path.jpg" aria-label="Follow one request" src="recordings/_renders/01-request-path.mp4"></video><strong>01 · Follow one request</strong><p>Use case, port, and offline test.</p></div>
     <div><video controls preload="metadata" poster="recordings/_renders/02-two-placements.jpg" aria-label="One image, two placements" src="recordings/_renders/02-two-placements.mp4"></video><strong>02 · One image, two placements</strong><p>Dated EKS/kind proof and separate data.</p></div>
@@ -191,7 +202,7 @@
     <div><video controls preload="metadata" poster="recordings/_renders/04-agent-guard.jpg" aria-label="When the agent crosses the line" src="recordings/_renders/04-agent-guard.mp4"></video><strong>04 · Agent guard</strong><p>Fresh local proposed-write rejection.</p></div>
   </div>
   <h3>Four terminal walkthroughs</h3>
-  <p>These longer recordings were made in a disposable rehearsal snapshot. The offline deployment and adapter sections show dated captures from completed runs; the Kiro guard runs locally in the recording. Share versions use a synthetic system voice. Each card also provides a silent stage version and the narration text.</p>
+  <p>What does each proof look like at the terminal? The first walkthrough shows EKS, then kind, then their adjacent digest lines before turning to separate store settings. The recordings were made in a disposable rehearsal snapshot. Deployment and adapter sections use dated captures; the Kiro guard runs locally. Share versions use a synthetic system voice. Each card also has a silent stage version and narration text.</p>
   <div class="filmstrip">
     <div><video controls preload="metadata" poster="recordings/clips/_build/04-one-image-two-placements/offline/04-one-image-two-placements.jpg" aria-label="Terminal walkthrough of two placements" src="recordings/clips/_build/04-one-image-two-placements/offline/04-one-image-two-placements.share.mp4"></video><strong>04 · One image, two placements</strong><p>28 September EKS and kind capture. <a href="recordings/clips/_build/04-one-image-two-placements/offline/04-one-image-two-placements.stage.mp4">Silent stage</a> · <a href="recordings/clips/_build/04-one-image-two-placements/offline/narration.md">Narration</a></p></div>
     <div><video controls preload="metadata" poster="recordings/clips/_build/05-swap-the-database-with-config/offline/05-swap-the-database-with-config.jpg" aria-label="Terminal walkthrough of the configuration change" src="recordings/clips/_build/05-swap-the-database-with-config/offline/05-swap-the-database-with-config.share.mp4"></video><strong>05 · Change the store by configuration</strong><p>28 September kind flip; older adapter comparison. <a href="recordings/clips/_build/05-swap-the-database-with-config/offline/05-swap-the-database-with-config.stage.mp4">Silent stage</a> · <a href="recordings/clips/_build/05-swap-the-database-with-config/offline/narration.md">Narration</a></p></div>

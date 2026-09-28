@@ -10,14 +10,14 @@ EKS in the Region  /  kind on the laptop
 
 The demo treats kind as an on-premises stand-in.
 
-## 04s · The captured pods matched
+## 04s · Compare the running pod digests
 
 Status: CAPTURED · 2026-09-28. Source: `docs/evidence/captures/09-two-targets-2026-09-28-rebuild.txt`.
 
-EKS runtime: eks-auto-mode
-kind runtime: kind-onprem
+EKS / Region   sha256:185f46d5fb5e…
+kind / laptop  sha256:185f46d5fb5e…
 core fingerprint: 1fb824b53b38
-pod image sha256: 185f46d5fb5e…
+one image in the dated proof
 
 Both pods matched the locally built image; the core matched this checkout.
 

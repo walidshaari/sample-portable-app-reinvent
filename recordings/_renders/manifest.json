@@ -1,7 +1,7 @@
 {
   "format": "annotated evidence replay",
   "no_voiceover": true,
-  "rendered_at_utc": "2026-09-28T10:55:59.134780+00:00",
+  "rendered_at_utc": "2026-09-28T13:36:55.959786+00:00",
   "fresh_proofs": [
     "demo/02-testability.sh",
     "demo/07-kiro-guard.sh hook"
