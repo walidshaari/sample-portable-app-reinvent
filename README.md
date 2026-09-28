@@ -6,6 +6,18 @@ kind cluster that stands in for on-premises Kubernetes. The clusters use
 separate settings and data stores. Shared code makes a move possible; it does
 not by itself provide failover or prove data residency.
 
+## Follow along with ARC401
+
+Read the [ARC401 visual field guide](https://walidshaari.github.io/sample-portable-app-reinvent/arc401/)
+for diagrams, video walkthroughs, and the evidence behind the EKS and kind
+demo.
+
+Scan the QR code to open this
+[public code repository](https://github.com/walidshaari/sample-portable-app-reinvent)
+during the session. The QR redirects through `q.me-qr.com`.
+
+<img src="assets/arc401-repo-qr-code.png" width="180" alt="QR code that opens the ARC401 public code repository">
+
 ## Run the core locally
 
 Use Python 3.11 or later. From the repository root:
