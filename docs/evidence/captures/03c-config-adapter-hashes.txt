@@ -1,0 +1,9 @@
+
+$ sha256 of the PostgreSQL adapter inside a running pod on each cluster
+portable-app-eks         5cf3cad3d235a050
+kind-portable-onprem     5cf3cad3d235a050
+repository               5cf3cad3d235a050
+
+$ what differs: where the connection settings come from
+region  POSTGRES_HOST=<Aurora cluster endpoint>  credentials: Secrets Manager -> External Secrets -> Secret app-db
+onprem  POSTGRES_HOST=pg-rw (CloudNativePG)      credentials: Secret pg-app generated in-cluster

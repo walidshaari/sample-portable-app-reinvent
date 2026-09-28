@@ -1,0 +1,8 @@
+
+$ malformed user requests on EKS and kind
+core fingerprint matches checkout: 1fb824b53b38
+EKS              missing-email    HTTP 400
+EKS              numeric-name     HTTP 400
+kind             missing-email    HTTP 400
+kind             numeric-name     HTTP 400
+all malformed requests returned HTTP 400

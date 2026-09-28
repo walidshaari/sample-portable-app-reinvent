@@ -1,0 +1,14 @@
+
+$ git apply --stat demo/patches/tech-axis-postgres.patch
+ base_python/clean/infrastructure/composition.py    |    1
+ .../repositories/postgres_repositories.py          |  223 ++++++++++++++++++++
+ 2 files changed, 224 insertions(+)
+
+$ git diff --stat HEAD -- base_python/clean/domain base_python/clean/application
+(empty: domain, use cases and ports are byte-identical to HEAD)
+
+$ python3 kiro/archguard/archguard.py check
+archguard: no violations in 33 files, 0 warning(s) (config: archguard.toml)
+
+$ pytest port contract: the same assertions against memory, DynamoDB and PostgreSQL
+.....................................                                    [100%]

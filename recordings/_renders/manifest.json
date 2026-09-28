@@ -1,0 +1,35 @@
+{
+  "format": "annotated evidence replay",
+  "no_voiceover": true,
+  "rendered_at_utc": "2026-09-28T10:55:59.134780+00:00",
+  "fresh_proofs": [
+    "demo/02-testability.sh",
+    "demo/07-kiro-guard.sh hook"
+  ],
+  "two_target_proof": "docs/evidence/captures/09-two-targets-2026-09-28-rebuild.txt",
+  "two_target_capture_date": "2026-09-28",
+  "archive_sources": [
+    "docs/evidence/captures/03c-config-adapter-hashes.txt",
+    "docs/evidence/captures/04b-tech-after.txt"
+  ],
+  "core_fingerprint": "1fb824b53b38588c2cd80f087d5ccedc8ae979ac7e789db3b06bb2be8609b1ea",
+  "postgres_adapter_fingerprint": "5cf3cad3d235a05051494c1b8b060305f435e82f3650b5cf6fbe518eebb43531",
+  "clips": [
+    {
+      "slug": "01-request-path",
+      "seconds": 18
+    },
+    {
+      "slug": "02-two-placements",
+      "seconds": 19
+    },
+    {
+      "slug": "03-change-axes",
+      "seconds": 20
+    },
+    {
+      "slug": "04-agent-guard",
+      "seconds": 19
+    }
+  ]
+}

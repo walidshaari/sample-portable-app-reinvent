@@ -1,0 +1,28 @@
+
+$ health before
+{"runtime":"kind-onprem","backend":"PostgresUserRepository","store":"postgresql","endpoint":null,"node":"portable-onprem-control-plane","core_sha256":"1fb824b53b38"}
+
+$ diff persistence.env persistence.dynamodb-local.env      # the entire change
+--- codetalk_deployment/k8s/overlays/onprem/persistence.env	2026-09-28 12:30:13
++++ codetalk_deployment/k8s/overlays/onprem/persistence.dynamodb-local.env	2026-09-27 01:19:57
+@@ -1,3 +1,8 @@
+-REPOSITORY_BACKEND=postgres
+-POSTGRES_PORT=5432
+-POSTGRES_SSLMODE=require
++REPOSITORY_BACKEND=dynamodb
++DYNAMODB_USERS_TABLE=portable-app-users
++DYNAMODB_ORDERS_TABLE=portable-app-orders
++DYNAMODB_ENDPOINT_URL=http://dynamodb-local.dev-tools.svc.cluster.local:8000
++DYNAMODB_REGION=local
++AWS_ACCESS_KEY_ID=devonlyplaceholder
++AWS_SECRET_ACCESS_KEY=devonlyplaceholder
++DYNAMODB_CREATE_TABLES=true
+
+$ kubectl apply -k codetalk_deployment/k8s/overlays/onprem
+rolled in 11s
+
+$ health after
+{"runtime":"kind-onprem","backend":"DynamoDBUserRepository","store":"dynamodb-api","endpoint":"custom","node":"portable-onprem-control-plane","core_sha256":"1fb824b53b38"}
+
+$ hash of every .py file in domain/ application/ infrastructure/ (before, after)
+before 080bddada88f  after 080bddada88f  identical

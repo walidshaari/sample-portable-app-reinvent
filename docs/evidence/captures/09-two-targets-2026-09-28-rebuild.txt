@@ -1,0 +1,14 @@
+
+$ EKS in the Region
+{"runtime":"eks-auto-mode","repository_backend":"dynamodb","store":"dynamodb-api","core_sha256":"1fb824b53b38"}
+
+$ kind on this laptop
+{"runtime":"kind-onprem","repository_backend":"postgres","store":"postgresql","core_sha256":"1fb824b53b38"}
+both stores are ready
+core fingerprint matches this checkout: 1fb824b53b38
+
+$ container image digest in each cluster
+EKS                sha256:185f46d5fb5e59cbe8240dfcf091b4bd3f5d21b5a3d0ed65c4af5652ff40e8f9
+kind               sha256:185f46d5fb5e59cbe8240dfcf091b4bd3f5d21b5a3d0ed65c4af5652ff40e8f9
+one container digest on both clusters
+container digest matches the locally built image

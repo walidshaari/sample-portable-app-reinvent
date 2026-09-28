@@ -1,0 +1,76 @@
+{
+  "slug": "05-swap-the-database-with-config",
+  "title": "Swap the database with one deployment file",
+  "mode": "offline",
+  "rendered_at_utc": "2026-09-28T09:46:34.400612+00:00",
+  "recorded": "2026-09-28",
+  "captured_sections": {
+    "screen_02": "28 SEP 2026",
+    "screen_03": "26 SEP 2026"
+  },
+  "commit": "f562a1d",
+  "source_provenance": "disposable snapshot of the uncommitted working tree",
+  "source_base_commit": "9905ae1",
+  "working_tree_dirty": true,
+  "core_fingerprint": "1fb824b53b38588c2cd80f087d5ccedc8ae979ac7e789db3b06bb2be8609b1ea",
+  "verified": true,
+  "checks": [
+    {
+      "id": "intro",
+      "status": "code",
+      "text_output": true,
+      "missing": [],
+      "core_gate_ok": null
+    },
+    {
+      "id": "screen_01",
+      "status": "code",
+      "text_output": true,
+      "missing": [],
+      "core_gate_ok": null
+    },
+    {
+      "id": "screen_02",
+      "status": "captured",
+      "text_output": true,
+      "missing": [],
+      "core_gate_ok": true
+    },
+    {
+      "id": "screen_03",
+      "status": "captured",
+      "text_output": true,
+      "missing": [],
+      "core_gate_ok": true
+    },
+    {
+      "id": "outro",
+      "status": "code",
+      "text_output": true,
+      "missing": [],
+      "core_gate_ok": null
+    }
+  ],
+  "outputs": {
+    "stage": {
+      "file": "05-swap-the-database-with-config.stage.mp4",
+      "seconds": 109.9
+    },
+    "share": {
+      "file": "05-swap-the-database-with-config.share.mp4",
+      "seconds": 129.4
+    }
+  },
+  "narration": {
+    "provider": "macOS system speech",
+    "voice": "Samantha",
+    "narration_sha256": "532a77f51bf8f2281f058978b2ff682b0a618581f61fe9f1bfff0379b3c38996",
+    "sections": [
+      "intro",
+      "screen_01",
+      "screen_02",
+      "screen_03",
+      "outro"
+    ]
+  }
+}

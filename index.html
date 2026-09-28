@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="ARC401 field guide: clean architecture, agent-assisted code, and one application core across kind and EKS.">
+  <title>ARC401 | Keep the core. Choose the placement.</title>
+  <style>
+    :root{--paper:#faf8f3;--white:#fffefa;--navy:#14243a;--ink:#22334a;--muted:#536277;--line:#cfd5d9;--orange:#e36d12;--orange-pale:#fff0e2;--blue-pale:#e9eff4;--green:#17654e}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.68 "Amazon Ember",Aptos,Arial,sans-serif}
+    a{color:#095c8c;text-underline-offset:3px}a:hover{color:#b34d08}
+    .skip{position:absolute;left:-9999px;top:0;background:var(--white);padding:12px;z-index:10}.skip:focus{left:8px}
+    .mast{background:var(--navy);color:#fff;min-height:440px;position:relative;overflow:hidden}
+    .mast:before{content:"";position:absolute;width:580px;height:580px;border:1px solid #64728a;border-radius:50%;right:-140px;top:-265px;box-shadow:0 0 0 78px #ffffff08,0 0 0 157px #ffffff06}
+    .mast-inner{max-width:1160px;margin:auto;padding:26px 38px 72px;position:relative}
+    .topline{display:flex;align-items:center;justify-content:space-between;gap:18px;letter-spacing:.14em;font-size:12px;font-weight:700;text-transform:uppercase}
+    .topline .mark{color:#ffab65}.topline a{color:#fff;text-decoration:none}
+    .eyebrow{color:#ffab65;letter-spacing:.17em;font-size:12px;font-weight:700;text-transform:uppercase;margin:90px 0 15px}
+    h1{font-size:clamp(42px,6.5vw,84px);max-width:900px;line-height:1.03;letter-spacing:-.053em;margin:0;color:white}
+    .dek{font-size:clamp(18px,2vw,23px);max-width:740px;line-height:1.42;margin:25px 0 0;color:#e1e7ed}
+    .meta{display:flex;gap:12px;flex-wrap:wrap;margin-top:34px}.meta span{border:1px solid #627084;border-radius:99px;padding:5px 13px;font-size:13px}
+    .layout{display:grid;grid-template-columns:205px minmax(0,1fr);gap:48px;max-width:1160px;margin:auto;padding:0 38px}
+    nav{align-self:start;position:sticky;top:20px;padding-top:58px;font-size:13px;line-height:1.4}
+    nav strong{display:block;font-size:11px;letter-spacing:.16em;color:var(--muted);margin:0 0 15px}nav a{display:block;padding:8px 0;color:var(--muted);text-decoration:none;border-left:2px solid transparent;padding-left:12px}nav a:hover,nav a:focus{color:var(--navy);border-color:var(--orange)}
+    article{padding:55px 0 100px;max-width:850px}
+    section{scroll-margin-top:28px;margin-bottom:68px}
+    h2{font-size:clamp(28px,3.2vw,43px);line-height:1.13;letter-spacing:-.035em;color:var(--navy);margin:0 0 19px}
+    h3{font-size:21px;line-height:1.3;color:var(--navy);margin:30px 0 12px}
+    p{margin:0 0 18px}strong{color:var(--navy)}
+    .lead{font-size:21px;line-height:1.52;color:#32445c}
+    .ribbon{border-left:5px solid var(--orange);padding:17px 22px;background:var(--orange-pale);color:var(--navy);font-size:18px;margin:30px 0}
+    .sourcebar{display:flex;justify-content:space-between;gap:15px;align-items:center;border:1px solid var(--line);background:var(--white);padding:13px 18px;margin:0 0 34px;font-size:14px}
+    .sourcebar a{font-weight:700}
+    .micro{font-size:13px;color:var(--muted)}
+    .figure{border:1px solid var(--line);background:var(--white);padding:23px 24px 15px;margin:29px 0}
+    .figure svg{display:block;width:100%;height:auto}.figure figcaption{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;margin-top:8px}
+    .figure svg text{font-family:"Amazon Ember",Aptos,Arial,sans-serif;fill:var(--navy)}
+    .figure svg .small{font-size:13px;fill:var(--muted)}.figure svg .label{font-size:18px;font-weight:700}
+    .figure svg .node{fill:#fffefa;stroke:#aab5c2;stroke-width:1.5}.figure svg .accent{fill:var(--orange-pale);stroke:var(--orange);stroke-width:2}
+    .figure svg .zone{fill:#f1f4f6;stroke:#aab5c2;stroke-width:1.5}.figure svg .edge{stroke:#40526a;stroke-width:2;fill:none;marker-end:url(#arrow)}
+    .codebox{background:#16263c;color:#e8f1fa;margin:24px 0;border:1px solid #263f5a}
+    .codehead{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 15px;border-bottom:1px solid #385067;font-size:12px;letter-spacing:.02em;color:#cbd7e5;overflow-wrap:anywhere}
+    pre{font:14px/1.58 "SFMono-Regular",Consolas,Monaco,monospace;margin:0;padding:18px;overflow:auto;tab-size:4}
+    code{font-family:"SFMono-Regular",Consolas,Monaco,monospace;font-size:.88em}
+    .codebox code{font-size:1em;color:inherit}.key{color:#ffb875}.comment{color:#a9bfce}.str{color:#b6e0cb}
+    .compare{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:27px 0}
+    .compare>div{padding:19px;border:1px solid var(--line);background:var(--white)}
+    .compare h3{margin:0 0 9px;font-size:16px}.compare p{font-size:15px;margin:0}
+    .chip{display:inline-block;border:1px solid var(--line);border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.08em;padding:3px 8px;margin-bottom:10px}
+    .chip.orange{border-color:#e6ac80;color:#a43e00;background:var(--orange-pale)}
+    .chip.green{border-color:#9bc3b3;color:var(--green);background:#ebf5ef}
+    .proof{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}
+    .proof>div{padding:17px 18px;border:1px solid var(--line);background:var(--white)}.proof b{display:block;font-size:15px}.proof p{font-size:14px;margin:7px 0 0}
+    .proof .need{border-top:3px solid var(--orange)}.proof .shown{border-top:3px solid var(--green)}
+    .filmstrip{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:25px 0}.filmstrip>div{background:var(--white);border:1px solid var(--line);padding:14px}.filmstrip video{display:block;width:100%;background:var(--navy)}.filmstrip strong{display:block;margin:9px 0 2px}.filmstrip p{font-size:13px;margin:0;color:var(--muted)}
+    .axis{width:100%;border-collapse:collapse;font-size:15px;margin:20px 0 10px}.axis th{text-align:left;color:var(--navy);background:var(--blue-pale)}.axis th,.axis td{padding:12px;border:1px solid var(--line);vertical-align:top}.axis td:first-child{font-weight:700}
+    .beat{font-size:12px;color:#98450d;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+    .end{border-top:3px solid var(--navy);padding-top:24px;margin-top:70px}
+    footer{background:var(--navy);color:#dce4eb;padding:22px 38px;font-size:13px}footer div{max-width:1084px;margin:auto}footer a{color:#fff}
+    @media(max-width:780px){.mast-inner{padding:20px 22px 55px}.eyebrow{margin-top:75px}.layout{display:block;padding:0 22px}nav{display:none}article{padding-top:38px}.sourcebar{display:block}.sourcebar a{display:block;margin-top:4px}.compare,.proof,.filmstrip{grid-template-columns:1fr}.figure{padding:15px}.codehead{font-size:11px}}
+    @media print{body{background:#fff;font-size:12px}.mast{min-height:auto;-webkit-print-color-adjust:exact;print-color-adjust:exact}.mast-inner{padding:18px 25px 30px}.eyebrow{margin-top:24px}h1{font-size:45px}.layout{display:block;padding:0 25px}nav{display:none}article{padding:22px 0}.figure,.codebox,.compare,.proof{break-inside:avoid}section{margin-bottom:32px}footer{display:none}}
+  </style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to article</a>
+<header class="mast"><div class="mast-inner">
+  <div class="topline"><span class="mark">ARC401 / Field guide</span><a href="#sources">Sources &amp; limits ↓</a></div>
+  <p class="eyebrow">Architecture for the agent-assisted era</p>
+  <h1>Keep the core.<br>Choose the placement.</h1>
+  <p class="dek">One application crosses from a laptop Kubernetes cluster to EKS in a Region. The useful lesson is where the code can change. Identical code alone cannot guarantee the outcome.</p>
+  <div class="meta"><span>10-minute theory</span><span>25-minute code tour</span><span>kind + EKS</span></div>
+</div></header>
+<div class="layout">
+<nav aria-label="Article sections"><strong>IN THIS STORY</strong>
+  <a href="#tax">01 / The change tax</a><a href="#boundary">02 / The boundary</a>
+  <a href="#placements">03 / Two placements</a><a href="#axes">04 / Two kinds of change</a>
+  <a href="#agents">05 / Agent guardrails</a><a href="#claims">06 / What is proved</a><a href="#practice">07 / Rehearse it</a>
+</nav>
+<main id="main"><article>
+<div class="sourcebar"><span>Read the code alongside the article</span><a href="https://github.com/walidshaari/sample-portable-app-reinvent/tree/b9ef30a2e7d73311f12a6e3e2360c1a21f9214c8">Open the public source ↗</a></div>
+<section id="tax">
+  <p class="beat">01 · The problem</p><h2>Every shortcut becomes a change tax.</h2>
+  <p class="lead">In the starting app, a business action knows a DynamoDB table name and raises a FastAPI exception. Moving storage or changing the HTTP edge means touching the action itself.</p>
+  <div class="codebox"><div class="codehead"><span>src_python/monolith/monolith.py · lines 62-73 · comments omitted</span><span>starting point</span></div><pre><code><span class="key">def</span> save_user(data: dict):
+    save_to_dynamodb(<span class="str">"Users"</span>, data)
+    <span class="key">return</span> data
+
+<span class="key">def</span> get_user(user_id: str):
+    user = get_from_dynamodb(<span class="str">"Users"</span>, {<span class="str">"id"</span>: user_id})
+    <span class="key">if not</span> user:
+        <span class="key">raise</span> HTTPException(status_code=404, detail=<span class="str">"User not found"</span>)
+    <span class="key">return</span> user</code></pre></div>
+  <p>The problem grows with agent-generated changes: a plausible local edit can spread a platform choice through many files. A readable boundary gives a human reviewer and an assistant a smaller place to look.</p>
+</section>
+<section id="boundary">
+  <p class="beat">02 · The design</p><h2>Make the dependency direction visible.</h2>
+  <p>The HTTP edge accepts a request. A use case performs the action through a small port. At startup, the composition root supplies the adapter. The database call happens outward; the use case imports only the port.</p>
+  <figure class="figure">
+    <svg viewBox="0 0 1000 300" role="img" aria-labelledby="boundary-title boundary-desc">
+      <title id="boundary-title">Request flow and code dependency across the clean architecture boundary</title>
+      <desc id="boundary-desc">A request travels from HTTP to use case, then through a repository port to an adapter and store. The use case and port form the core. The composition root selects the adapter.</desc>
+      <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#40526a"/></marker></defs>
+      <rect x="195" y="43" width="422" height="180" rx="14" class="zone"/>
+      <text x="215" y="68" class="small">CORE · domain + application</text>
+      <rect x="15" y="95" width="150" height="92" rx="10" class="node"/><text x="90" y="137" text-anchor="middle" class="label">HTTP</text><text x="90" y="159" text-anchor="middle" class="small">request edge</text>
+      <rect x="225" y="95" width="170" height="92" rx="10" class="accent"/><text x="310" y="137" text-anchor="middle" class="label">Use case</text><text x="310" y="159" text-anchor="middle" class="small">business action</text>
+      <rect x="435" y="95" width="150" height="92" rx="10" class="node"/><text x="510" y="137" text-anchor="middle" class="label">Port</text><text x="510" y="159" text-anchor="middle" class="small">required behavior</text>
+      <rect x="635" y="95" width="150" height="92" rx="10" class="node"/><text x="710" y="137" text-anchor="middle" class="label">Adapter</text><text x="710" y="159" text-anchor="middle" class="small">DynamoDB / SQL</text>
+      <rect x="825" y="95" width="150" height="92" rx="10" class="node"/><text x="900" y="137" text-anchor="middle" class="label">Store</text>
+      <path d="M166 141 H217" class="edge"/><path d="M396 141 H427" class="edge"/><path d="M586 141 H627" class="edge"/><path d="M786 141 H817" class="edge"/>
+      <text x="500" y="255" text-anchor="middle" class="small">At startup, composition chooses which adapter fulfills the port.</text>
+    </svg>
+    <figcaption>Follow the solid arrows for a request. In source code, the use case depends on the port; the database adapter depends on that same contract.</figcaption>
+  </figure>
+  <div class="codebox"><div class="codehead"><span>base_python/clean/application/use_cases/create_user.py · lines 7-22 · docstrings omitted</span><span>stable action</span></div><pre><code><span class="key">class</span> CreateUserUseCase:
+    <span class="key">def</span> __init__(self, user_repository: UserRepository):
+        self._user_repository = user_repository
+
+    <span class="key">async def</span> execute(self, input_data: Dict[str, Any]) -&gt; User:
+        name = input_data.get(<span class="str">"name"</span>)
+        email = input_data.get(<span class="str">"email"</span>)
+        user_id = str(uuid.uuid4())
+        user = User(user_id, name, email)
+        <span class="key">await</span> self._user_repository.create(user)
+        <span class="key">return</span> user</code></pre></div>
+  <p>The port promises <code>create</code>, <code>find_by_id</code>, <code>find_all</code>, and <code>delete</code>. The registry in <code>infrastructure/composition.py</code> selects <code>memory</code>, <code>dynamodb</code>, or <code>postgres</code> from configuration. This is an explicit extension point, not a promise that every future data model will fit it.</p>
+  <p>The entity also checks input types before using string operations. A missing email or numeric name raises <code>ValueError</code>; the HTTP edge translates that error to 400. Entity and HTTP tests cover both outcomes in the <a href="https://github.com/walidshaari/sample-portable-app-reinvent/tree/b9ef30a2e7d73311f12a6e3e2360c1a21f9214c8/base_python/clean/tests">public source</a>. The <a href="evidence/captures/10-input-validation-2026-09-28.txt">28 September capture from the rehearsal build</a> shows HTTP 400 for both requests on EKS and kind. The rule stays usable outside HTTP and makes malformed input easier to diagnose.</p>
+</section>
+<section id="placements">
+  <p class="beat">03 · The placement proof</p><h2>One image. Two deployments. Separate data.</h2>
+  <p>The stage proof is <a href="https://github.com/walidshaari/sample-portable-app-reinvent/blob/b9ef30a2e7d73311f12a6e3e2360c1a21f9214c8/demo/09-two-targets.sh"><code>demo/09-two-targets.sh</code></a>. When run, it checks each runtime label, store readiness, a core fingerprint matching the checkout, and pod image digests matching each other and the locally built image. The 28 September recording shows this result for the rehearsal build. The two clusters have different configuration, identities, and stores.</p>
+  <figure class="figure">
+    <svg viewBox="0 0 1000 380" role="img" aria-labelledby="place-title place-desc">
+      <title id="place-title">The same application image in EKS and kind with separate stores</title>
+      <desc id="place-desc">A single application image feeds an EKS deployment in a Region and a kind deployment on a laptop. EKS connects to a Region database. kind connects to its own PostgreSQL. There is no data replication arrow between the stores.</desc>
+      <defs><marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#40526a"/></marker></defs>
+      <rect x="367" y="15" width="265" height="70" rx="10" class="accent"/><text x="500" y="48" text-anchor="middle" class="label">Application image</text><text x="500" y="68" text-anchor="middle" class="small">matched in 28 Sep 2026 proof</text>
+      <rect x="28" y="125" width="445" height="190" rx="14" class="zone"/><rect x="527" y="125" width="445" height="190" rx="14" class="zone"/>
+      <text x="50" y="153" class="small">IN REGION</text><text x="549" y="153" class="small">LAPTOP · ON-PREM STAND-IN</text>
+      <rect x="50" y="171" width="168" height="85" rx="9" class="node"/><text x="134" y="208" text-anchor="middle" class="label">EKS</text><text x="134" y="233" text-anchor="middle" class="small">own settings</text>
+      <rect x="282" y="171" width="168" height="85" rx="9" class="node"/><text x="366" y="208" text-anchor="middle" class="label">Region store</text><text x="366" y="233" text-anchor="middle" class="small">DynamoDB / Aurora</text>
+      <rect x="549" y="171" width="168" height="85" rx="9" class="node"/><text x="633" y="208" text-anchor="middle" class="label">kind</text><text x="633" y="233" text-anchor="middle" class="small">own settings</text>
+      <rect x="781" y="171" width="168" height="85" rx="9" class="node"/><text x="865" y="208" text-anchor="middle" class="label">PostgreSQL</text><text x="865" y="233" text-anchor="middle" class="small">local cluster</text>
+      <path d="M500 86 V104 H134 V163" stroke="#40526a" stroke-width="2" fill="none" marker-end="url(#arrow2)"/><path d="M500 104 H633 V163" stroke="#40526a" stroke-width="2" fill="none" marker-end="url(#arrow2)"/><path d="M220 213 H274" stroke="#40526a" stroke-width="2" fill="none" marker-end="url(#arrow2)"/><path d="M719 213 H773" stroke="#40526a" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+      <text x="500" y="350" text-anchor="middle" class="small">Separate data boundary · no replication is shown or claimed</text>
+    </svg>
+    <figcaption>Matching image bytes establish application portability. They do not establish shared state, regional failover, or policy compliance.</figcaption>
+  </figure>
+  <p class="micro">The published source has the same core and PostgreSQL adapter bytes as the rehearsal checkout. It uses a smaller package, so its image digest must be established with a new build and deployment before repeating the live equality claim.</p>
+  <div class="ribbon">Placement is an architectural option. Resilience and residency become credible only when data, traffic, recovery, access, and evidence are designed for that option.</div>
+</section>
+<section id="axes">
+  <p class="beat">04 · What changes</p><h2>Separate a configuration flip from a technology change.</h2>
+  <table class="axis"><thead><tr><th scope="col">Change</th><th scope="col">Code that moves</th><th scope="col">What still needs work</th></tr></thead><tbody>
+    <tr><td>Same PostgreSQL API, different placement</td><td>Deployment settings and credentials; existing adapter remains</td><td>Network, secrets, operations, data movement</td></tr>
+    <tr><td>DynamoDB model → PostgreSQL model</td><td>New adapter and one registry entry; core remains</td><td>Behavioral contract, schema, migration, cutover</td></tr>
+  </tbody></table>
+  <p>In the PostgreSQL adapter, <code>create()</code> uses <code>INSERT ... ON CONFLICT DO UPDATE</code> to preserve the port’s overwrite behavior. It intentionally adds no foreign key for <code>orders.user_id</code>, because the existing domain accepts an order for an unknown user. These data-model decisions belong in the adapter.</p>
+  <div class="codebox"><div class="codehead"><span>base_python/clean/infrastructure/composition.py · lines 39-43</span><span>technology registry</span></div><pre><code>BACKENDS: Dict[str, str] = {
+    <span class="str">"memory"</span>: <span class="str">"infrastructure.repositories.in_memory_backend:build"</span>,
+    <span class="str">"dynamodb"</span>: <span class="str">"infrastructure.repositories.dynamodb_backend:build"</span>,
+    <span class="str">"postgres"</span>: <span class="str">"infrastructure.repositories.postgres_repositories:build"</span>,
+}</code></pre></div>
+  <p>The prepared <code>demo/04-tech-axis.sh</code> replays this adapter addition and runs the same repository contract against each implementation. Label it as a patch replay on stage; it is not a spontaneous migration.</p>
+</section>
+<section id="agents">
+  <p class="beat">05 · Agent-assisted change</p><h2>Give agents a map, then test the boundary.</h2>
+  <p>Clean names and small ports help an assistant locate the intended change. Kiro steering explains the dependency rule. Skills give repeatable tasks. An MCP server exposes architecture checks. The PreToolUse hook checks a proposed write and blocks an SDK import into the domain with <code>AG001</code> and exit code <code>2</code>.</p>
+  <div class="compare"><div><span class="chip orange">PROPOSED SHORTCUT</span><h3><code>domain/user.py</code> imports <code>boto3</code></h3><p>The agent reaches from a business entity into the storage SDK. The hook rejects that proposed edit before it is written.</p></div><div><span class="chip green">REPAIR PATH</span><h3>Port → adapter → composition</h3><p>State the operation the use case needs, implement it outside the core, inject it, then run the shared contract.</p></div></div>
+  <p>This improves change review and troubleshooting: a failing entity rule, contract test, adapter, and HTTP response have distinct owners. Teams can adopt it one action at a time: extract one action and one port before refactoring the whole app. No layout guarantees a correct agent answer; tests and review remain part of the loop.</p>
+  <p class="micro">The demo hook is a deterministic replay of a Kiro tool payload. Hook coverage depends on how edits are made. The git hook and CI template must be installed and enabled in a target repository; the architecture checker’s parse warnings call for a separate syntax or test gate.</p>
+</section>
+<section id="claims">
+  <p class="beat">06 · Claim discipline</p><h2>Say exactly what the evidence supports.</h2>
+  <div class="proof"><div class="shown"><span class="chip green">SHOWN BY THE REPO</span><b>Code portability</b><p>Core fingerprint and pod digest checks compare EKS, kind, and the local checkout when the stage command succeeds.</p></div><div class="need"><span class="chip orange">NEEDS A SEPARATE TEST</span><b>Recovery</b><p>Define RTO/RPO; prove backups, restore or replication, and traffic switch under a failure drill.</p></div><div class="shown"><span class="chip green">SHOWN BY THE DEMO DESIGN</span><b>Separate data placement</b><p>Each target selects its own store. A write on one side is not implied to appear on the other.</p></div><div class="need"><span class="chip orange">NEEDS GOVERNANCE EVIDENCE</span><b>Data residency</b><p>Verify where data, backups, logs, telemetry, and access flows go. Document controls and permitted transfers.</p></div></div>
+  <p>kind runs on one laptop node. Its two PostgreSQL instances do not prove site-level recovery. Treat it as an on-premises stand-in that proves the application can run locally, subject to the tested dependencies and network setup.</p>
+</section>
+<section id="practice">
+  <p class="beat">07 · Present it</p><h2>Make each screen answer one question.</h2>
+  <p>For the 40-minute session, spend 10 minutes on the tax, core, and two axes. Use 25 minutes to trace one request, show the EKS/kind proof, flip Region persistence, replay the adapter addition, and reject the agent shortcut. Reserve five minutes for Q&amp;A. Keep the two-target proof, adapter contract, and guard rejection if time runs short.</p>
+  <p>Ask a colleague to explain the two deployment diagram without your narration. If they say “automatic failover” or “compliant residency,” revise the line you used. The rehearsal succeeds when a listener can say what stayed fixed, what changed, and what is still unproved.</p>
+  <h3>Four short evidence replays</h3>
+  <p>These four short videos replay evidence with captions and no voiceover. They are illustrated summaries of the tests and dated two-target capture. The <a href="recordings/_renders/manifest.json">evidence manifest</a> gives their sources and dates.</p>
+  <div class="filmstrip">
+    <div><video controls preload="metadata" poster="recordings/_renders/01-request-path.jpg" aria-label="Follow one request" src="recordings/_renders/01-request-path.mp4"></video><strong>01 · Follow one request</strong><p>Use case, port, and offline test.</p></div>
+    <div><video controls preload="metadata" poster="recordings/_renders/02-two-placements.jpg" aria-label="One image, two placements" src="recordings/_renders/02-two-placements.mp4"></video><strong>02 · One image, two placements</strong><p>Dated EKS/kind proof and separate data.</p></div>
+    <div><video controls preload="metadata" poster="recordings/_renders/03-change-axes.jpg" aria-label="Two ways to change a store" src="recordings/_renders/03-change-axes.mp4"></video><strong>03 · Two change axes</strong><p>Configuration choice and adapter contract.</p></div>
+    <div><video controls preload="metadata" poster="recordings/_renders/04-agent-guard.jpg" aria-label="When the agent crosses the line" src="recordings/_renders/04-agent-guard.mp4"></video><strong>04 · Agent guard</strong><p>Fresh local proposed-write rejection.</p></div>
+  </div>
+  <h3>Four terminal walkthroughs</h3>
+  <p>These longer recordings were made in a disposable rehearsal snapshot. The offline deployment and adapter sections show dated captures from completed runs; the Kiro guard runs locally in the recording. Share versions use a synthetic system voice. Each card also provides a silent stage version and the narration text.</p>
+  <div class="filmstrip">
+    <div><video controls preload="metadata" poster="recordings/clips/_build/04-one-image-two-placements/offline/04-one-image-two-placements.jpg" aria-label="Terminal walkthrough of two placements" src="recordings/clips/_build/04-one-image-two-placements/offline/04-one-image-two-placements.share.mp4"></video><strong>04 · One image, two placements</strong><p>28 September EKS and kind capture. <a href="recordings/clips/_build/04-one-image-two-placements/offline/04-one-image-two-placements.stage.mp4">Silent stage</a> · <a href="recordings/clips/_build/04-one-image-two-placements/offline/narration.md">Narration</a></p></div>
+    <div><video controls preload="metadata" poster="recordings/clips/_build/05-swap-the-database-with-config/offline/05-swap-the-database-with-config.jpg" aria-label="Terminal walkthrough of the configuration change" src="recordings/clips/_build/05-swap-the-database-with-config/offline/05-swap-the-database-with-config.share.mp4"></video><strong>05 · Change the store by configuration</strong><p>28 September kind flip; older adapter comparison. <a href="recordings/clips/_build/05-swap-the-database-with-config/offline/05-swap-the-database-with-config.stage.mp4">Silent stage</a> · <a href="recordings/clips/_build/05-swap-the-database-with-config/offline/narration.md">Narration</a></p></div>
+    <div><video controls preload="metadata" poster="recordings/clips/_build/06-new-database-one-new-file/offline/06-new-database-one-new-file.jpg" aria-label="Terminal walkthrough of the adapter change" src="recordings/clips/_build/06-new-database-one-new-file/offline/06-new-database-one-new-file.share.mp4"></video><strong>06 · Add a database adapter</strong><p>28 September patch and contract-test capture. <a href="recordings/clips/_build/06-new-database-one-new-file/offline/06-new-database-one-new-file.stage.mp4">Silent stage</a> · <a href="recordings/clips/_build/06-new-database-one-new-file/offline/narration.md">Narration</a></p></div>
+    <div><video controls preload="metadata" poster="recordings/clips/_build/09-stop-the-agent-before-it-writes/offline/09-stop-the-agent-before-it-writes.jpg" aria-label="Terminal walkthrough of the Kiro boundary guard" src="recordings/clips/_build/09-stop-the-agent-before-it-writes/offline/09-stop-the-agent-before-it-writes.share.mp4"></video><strong>09 · Stop the agent write</strong><p>Local hook and pre-commit replays. <a href="recordings/clips/_build/09-stop-the-agent-before-it-writes/offline/09-stop-the-agent-before-it-writes.stage.mp4">Silent stage</a> · <a href="recordings/clips/_build/09-stop-the-agent-before-it-writes/offline/narration.md">Narration</a></p></div>
+  </div>
+  <p class="micro">The video players, narration files, and dated evidence are included with this article. The <a href="https://github.com/walidshaari/sample-portable-app-reinvent/tree/b9ef30a2e7d73311f12a6e3e2360c1a21f9214c8">public code repository</a> is intentionally separate from this media site.</p>
+</section>
+<section class="end" id="sources">
+  <h2>Source notes and limits</h2>
+  <p>The code excerpts match <a href="https://github.com/walidshaari/sample-portable-app-reinvent/tree/b9ef30a2e7d73311f12a6e3e2360c1a21f9214c8">public source commit b9ef30a</a>. The dated videos and EKS/kind captures come from the rehearsal build. Its core and PostgreSQL adapter bytes match the public source, but its image digest does not establish the public build’s digest. For a new live proof, build the public package, deploy that image to both targets, and run <a href="https://github.com/walidshaari/sample-portable-app-reinvent/blob/b9ef30a2e7d73311f12a6e3e2360c1a21f9214c8/demo/09-two-targets.sh"><code>demo/09-two-targets.sh</code></a>. Check the <a href="recordings/_renders/manifest.json">video manifest</a> for the capture dates.</p>
+  <p>For recovery objectives and sovereignty controls, see the <a href="https://docs.aws.amazon.com/wellarchitected/latest/framework/rel_planning_for_recovery_disaster_recovery.html">AWS Reliability Pillar: recovery strategies</a>, the <a href="https://docs.aws.amazon.com/wellarchitected/latest/digital-sovereignty-lens/dssec07.html">AWS Digital Sovereignty Lens: verifiable data controls</a>, and the <a href="https://docs.aws.amazon.com/wellarchitected/latest/data-residency-hybrid-cloud-services-lens/drhcsec01-bp02.html">guidance on residency for logs</a>. This educational sample makes no compliance certification.</p>
+</section>
+</article></main>
+</div>
+<footer><div>ARC401 field guide · <a href="https://github.com/walidshaari/sample-portable-app-reinvent/tree/b9ef30a2e7d73311f12a6e3e2360c1a21f9214c8">Public code</a> · Built for print, projector, and laptop reading</div></footer>
+</body>
+</html>

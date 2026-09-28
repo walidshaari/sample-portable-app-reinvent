@@ -1,0 +1,76 @@
+{
+  "slug": "06-new-database-one-new-file",
+  "title": "A new database is one new file",
+  "mode": "offline",
+  "rendered_at_utc": "2026-09-28T09:46:51.189174+00:00",
+  "recorded": "2026-09-28",
+  "captured_sections": {
+    "screen_01": "28 SEP 2026",
+    "screen_02": "28 SEP 2026"
+  },
+  "commit": "f562a1d",
+  "source_provenance": "disposable snapshot of the uncommitted working tree",
+  "source_base_commit": "9905ae1",
+  "working_tree_dirty": true,
+  "core_fingerprint": "1fb824b53b38588c2cd80f087d5ccedc8ae979ac7e789db3b06bb2be8609b1ea",
+  "verified": true,
+  "checks": [
+    {
+      "id": "intro",
+      "status": "code",
+      "text_output": true,
+      "missing": [],
+      "core_gate_ok": null
+    },
+    {
+      "id": "screen_01",
+      "status": "captured",
+      "text_output": true,
+      "missing": [],
+      "core_gate_ok": true
+    },
+    {
+      "id": "screen_02",
+      "status": "captured",
+      "text_output": true,
+      "missing": [],
+      "core_gate_ok": true
+    },
+    {
+      "id": "screen_03",
+      "status": "code",
+      "text_output": true,
+      "missing": [],
+      "core_gate_ok": null
+    },
+    {
+      "id": "outro",
+      "status": "code",
+      "text_output": true,
+      "missing": [],
+      "core_gate_ok": null
+    }
+  ],
+  "outputs": {
+    "stage": {
+      "file": "06-new-database-one-new-file.stage.mp4",
+      "seconds": 95.0
+    },
+    "share": {
+      "file": "06-new-database-one-new-file.share.mp4",
+      "seconds": 114.6
+    }
+  },
+  "narration": {
+    "provider": "macOS system speech",
+    "voice": "Samantha",
+    "narration_sha256": "db16c522bf47d9042bcad9b88df39153f0716b6a9e658997ec8c53443134fcec",
+    "sections": [
+      "intro",
+      "screen_01",
+      "screen_02",
+      "screen_03",
+      "outro"
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "provider": "macOS system speech",
+  "voice": "Samantha",
+  "narration_sha256": "532a77f51bf8f2281f058978b2ff682b0a618581f61fe9f1bfff0379b3c38996",
+  "sections": [
+    "intro",
+    "screen_01",
+    "screen_02",
+    "screen_03",
+    "outro"
+  ]
+}

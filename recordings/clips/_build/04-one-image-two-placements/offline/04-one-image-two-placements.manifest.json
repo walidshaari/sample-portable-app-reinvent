@@ -1,0 +1,75 @@
+{
+  "slug": "04-one-image-two-placements",
+  "title": "One image, two placements",
+  "mode": "offline",
+  "rendered_at_utc": "2026-09-28T09:46:15.965139+00:00",
+  "recorded": "2026-09-28",
+  "captured_sections": {
+    "screen_02": "28 SEP 2026"
+  },
+  "commit": "f562a1d",
+  "source_provenance": "disposable snapshot of the uncommitted working tree",
+  "source_base_commit": "9905ae1",
+  "working_tree_dirty": true,
+  "core_fingerprint": "1fb824b53b38588c2cd80f087d5ccedc8ae979ac7e789db3b06bb2be8609b1ea",
+  "verified": true,
+  "checks": [
+    {
+      "id": "intro",
+      "status": "code",
+      "text_output": true,
+      "missing": [],
+      "core_gate_ok": null
+    },
+    {
+      "id": "screen_01",
+      "status": "code",
+      "text_output": true,
+      "missing": [],
+      "core_gate_ok": null
+    },
+    {
+      "id": "screen_02",
+      "status": "captured",
+      "text_output": true,
+      "missing": [],
+      "core_gate_ok": true
+    },
+    {
+      "id": "screen_03",
+      "status": "code",
+      "text_output": true,
+      "missing": [],
+      "core_gate_ok": null
+    },
+    {
+      "id": "outro",
+      "status": "code",
+      "text_output": true,
+      "missing": [],
+      "core_gate_ok": null
+    }
+  ],
+  "outputs": {
+    "stage": {
+      "file": "04-one-image-two-placements.stage.mp4",
+      "seconds": 122.3
+    },
+    "share": {
+      "file": "04-one-image-two-placements.share.mp4",
+      "seconds": 124.1
+    }
+  },
+  "narration": {
+    "provider": "macOS system speech",
+    "voice": "Samantha",
+    "narration_sha256": "29e3f0465a179867cc5599640d123dd3aef2b54afd6e755abdaadde28a37aae6",
+    "sections": [
+      "intro",
+      "screen_01",
+      "screen_02",
+      "screen_03",
+      "outro"
+    ]
+  }
+}
