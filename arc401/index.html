@@ -32,6 +32,10 @@
     p{margin:0 0 18px}strong{color:var(--navy)}
     .lead{font-size:21px;line-height:1.52;color:#32445c}
     .ribbon{border-left:5px solid var(--orange);padding:17px 22px;background:var(--orange-pale);color:var(--navy);font-size:18px;margin:30px 0}
+    .survey-card{display:grid;grid-template-columns:minmax(0,1fr) 176px;gap:26px;align-items:center;background:var(--white);border:1px solid var(--line);border-top:5px solid var(--orange);padding:24px}
+    .survey-card img{display:block;width:176px;height:auto}
+    .survey-action{display:inline-block;background:var(--navy);color:#fff;padding:9px 16px;text-decoration:none;font-weight:700}
+    .survey-action:hover,.survey-action:focus{background:#304967;color:#fff}
     .sourcebar{display:flex;justify-content:space-between;gap:15px;align-items:center;border:1px solid var(--line);background:var(--white);padding:13px 18px;margin:0 0 34px;font-size:14px}
     .sourcebar a{font-weight:700}
     .micro{font-size:13px;color:var(--muted)}
@@ -61,7 +65,7 @@
     .beat{font-size:12px;color:#98450d;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
     .end{border-top:3px solid var(--navy);padding-top:24px;margin-top:70px}
     footer{background:var(--navy);color:#dce4eb;padding:22px 38px;font-size:13px}footer div{max-width:1084px;margin:auto}footer a{color:#fff}
-    @media(max-width:780px){.mast-inner{padding:20px 22px 55px}.eyebrow{margin-top:75px}.layout{display:block;padding:0 22px}nav{display:none}article{padding-top:38px}.sourcebar{display:block}.sourcebar a{display:block;margin-top:4px}.compare,.proof,.filmstrip{grid-template-columns:1fr}.figure{padding:15px}.codehead{font-size:11px}}
+    @media(max-width:780px){.mast-inner{padding:20px 22px 55px}.eyebrow{margin-top:75px}.layout{display:block;padding:0 22px}nav{display:none}article{padding-top:38px}.sourcebar{display:block}.sourcebar a{display:block;margin-top:4px}.compare,.proof,.filmstrip,.survey-card{grid-template-columns:1fr}.survey-card img{width:150px}.figure{padding:15px}.codehead{font-size:11px}}
     @media print{body{background:#fff;font-size:12px}.mast{min-height:auto;-webkit-print-color-adjust:exact;print-color-adjust:exact}.mast-inner{padding:18px 25px 30px}.eyebrow{margin-top:24px}h1{font-size:45px}.layout{display:block;padding:0 25px}nav{display:none}article{padding:22px 0}.figure,.codebox,.compare,.proof{break-inside:avoid}section{margin-bottom:32px}footer{display:none}}
   </style>
 </head>
@@ -78,7 +82,7 @@
 <nav aria-label="Article sections"><strong>IN THIS STORY</strong>
   <a href="#tax">01 / The change tax</a><a href="#boundary">02 / The boundary</a>
   <a href="#placements">03 / Two placements</a><a href="#axes">04 / Two kinds of change</a>
-  <a href="#agents">05 / Agent guardrails</a><a href="#claims">06 / What is proved</a><a href="#practice">07 / Rehearse it</a>
+  <a href="#agents">05 / Agent guardrails</a><a href="#claims">06 / What is proved</a><a href="#practice">07 / Rehearse it</a><a href="#survey">Session feedback</a>
 </nav>
 <main id="main"><article>
 <div class="sourcebar"><span>Read the code alongside the article</span><span><a href="https://github.com/walidshaari/sample-portable-app-reinvent/tree/b9ef30a2e7d73311f12a6e3e2360c1a21f9214c8">Public source ↗</a> · <a href="https://github.com/walidshaari/sample-portable-app-reinvent/blob/gh-pages/arc401-portable-core.md">Markdown ↗</a></span></div>
@@ -215,6 +219,18 @@ container digest matches the locally built image</code></pre></div>
   <h2>Source notes and limits</h2>
   <p>The code excerpts match <a href="https://github.com/walidshaari/sample-portable-app-reinvent/tree/b9ef30a2e7d73311f12a6e3e2360c1a21f9214c8">public source commit b9ef30a</a>. The dated videos and EKS/kind captures come from the rehearsal build. Its core and PostgreSQL adapter bytes match the public source, but its image digest does not establish the public build’s digest. For a new live proof, build the public package, deploy that image to both targets, and run <a href="https://github.com/walidshaari/sample-portable-app-reinvent/blob/b9ef30a2e7d73311f12a6e3e2360c1a21f9214c8/demo/09-two-targets.sh"><code>demo/09-two-targets.sh</code></a>. Check the <a href="../recordings/_renders/manifest.json">video manifest</a> for the capture dates.</p>
   <p>For recovery objectives and sovereignty controls, see the <a href="https://docs.aws.amazon.com/wellarchitected/latest/framework/rel_planning_for_recovery_disaster_recovery.html">AWS Reliability Pillar: recovery strategies</a>, the <a href="https://docs.aws.amazon.com/wellarchitected/latest/digital-sovereignty-lens/dssec07.html">AWS Digital Sovereignty Lens: verifiable data controls</a>, and the <a href="https://docs.aws.amazon.com/wellarchitected/latest/data-residency-hybrid-cloud-services-lens/drhcsec01-bp02.html">guidance on residency for logs</a>. This educational sample makes no compliance certification.</p>
+</section>
+<section class="end" id="survey">
+  <p class="beat">ARC401 · Session feedback</p>
+  <h2>Help us improve this session.</h2>
+  <div class="survey-card">
+    <div>
+      <p>Did the architecture boundary and EKS/kind walkthrough answer your questions? Tell us what was clear and what needs another example.</p>
+      <p><a class="survey-action" href="https://production.awseventservices.com/events/Summit-Dubai-2026/tabs/more/evaluations?sessionId=ARC401">Open the ARC401 session survey ↗</a></p>
+      <p class="micro">Scan the QR code if you are viewing this page on another device.</p>
+    </div>
+    <a href="https://production.awseventservices.com/events/Summit-Dubai-2026/tabs/more/evaluations?sessionId=ARC401" aria-label="Open the ARC401 session survey"><img src="../assets/arc401-session-survey.png" alt="QR code for the ARC401 Dubai Summit session survey" width="176" height="176"></a>
+  </div>
 </section>
 </article></main>
 </div>

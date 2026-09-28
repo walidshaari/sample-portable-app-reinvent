@@ -165,3 +165,11 @@ The deployment and adapter sections contain dated rehearsal captures. The share 
 The code excerpts match [public source commit `b9ef30a`](https://github.com/walidshaari/sample-portable-app-reinvent/tree/b9ef30a2e7d73311f12a6e3e2360c1a21f9214c8). The videos and EKS/kind captures come from the rehearsal build. Its core and PostgreSQL adapter bytes match the public source. Its image digest does not establish the public build's digest. For a new live proof, build and deploy the public package to both targets, then run `demo/09-two-targets.sh`.
 
 For recovery objectives and sovereignty controls, see the [AWS Reliability Pillar's recovery strategies](https://docs.aws.amazon.com/wellarchitected/latest/framework/rel_planning_for_recovery_disaster_recovery.html), the [AWS Digital Sovereignty Lens on verifiable data controls](https://docs.aws.amazon.com/wellarchitected/latest/digital-sovereignty-lens/dssec07.html), and [guidance on residency for logs](https://docs.aws.amazon.com/wellarchitected/latest/data-residency-hybrid-cloud-services-lens/drhcsec01-bp02.html). This educational sample makes no compliance certification.
+
+## Share feedback on ARC401
+
+Did the architecture boundary and EKS/kind walkthrough answer your questions? Tell us what was clear and what needs another example.
+
+[Open the ARC401 session survey](https://production.awseventservices.com/events/Summit-Dubai-2026/tabs/more/evaluations?sessionId=ARC401), or scan the QR code:
+
+![QR code for the ARC401 Dubai Summit session survey](https://walidshaari.github.io/sample-portable-app-reinvent/assets/arc401-session-survey.png)
