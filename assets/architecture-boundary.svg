@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" role="img" aria-labelledby="boundary-title boundary-desc">
+<style>
+text { font-family: Arial, sans-serif; fill: #14243a; }
+.small { font-size: 13px; fill: #536277; }
+.label { font-size: 18px; font-weight: 700; }
+.node { fill: #fffefa; stroke: #aab5c2; stroke-width: 1.5; }
+.accent { fill: #fff0e2; stroke: #e36d12; stroke-width: 2; }
+.zone { fill: #f1f4f6; stroke: #aab5c2; stroke-width: 1.5; }
+.edge { stroke: #40526a; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+</style>
+<rect width="100%" height="100%" fill="#faf8f3"/>
+
+      <title id="boundary-title">Request flow and code dependency across the clean architecture boundary</title>
+      <desc id="boundary-desc">A request travels from HTTP to use case, then through a repository port to an adapter and store. The use case and port form the core. The composition root selects the adapter.</desc>
+      <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#40526a"/></marker></defs>
+      <rect x="195" y="43" width="422" height="180" rx="14" class="zone"/>
+      <text x="215" y="68" class="small">CORE · domain + application</text>
+      <rect x="15" y="95" width="150" height="92" rx="10" class="node"/><text x="90" y="137" text-anchor="middle" class="label">HTTP</text><text x="90" y="159" text-anchor="middle" class="small">request edge</text>
+      <rect x="225" y="95" width="170" height="92" rx="10" class="accent"/><text x="310" y="137" text-anchor="middle" class="label">Use case</text><text x="310" y="159" text-anchor="middle" class="small">business action</text>
+      <rect x="435" y="95" width="150" height="92" rx="10" class="node"/><text x="510" y="137" text-anchor="middle" class="label">Port</text><text x="510" y="159" text-anchor="middle" class="small">required behavior</text>
+      <rect x="635" y="95" width="150" height="92" rx="10" class="node"/><text x="710" y="137" text-anchor="middle" class="label">Adapter</text><text x="710" y="159" text-anchor="middle" class="small">DynamoDB / SQL</text>
+      <rect x="825" y="95" width="150" height="92" rx="10" class="node"/><text x="900" y="137" text-anchor="middle" class="label">Store</text>
+      <path d="M166 141 H217" class="edge"/><path d="M396 141 H427" class="edge"/><path d="M586 141 H627" class="edge"/><path d="M786 141 H817" class="edge"/>
+      <text x="500" y="255" text-anchor="middle" class="small">At startup, composition chooses which adapter fulfills the port.</text>
+    </svg>
