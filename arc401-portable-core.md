@@ -170,6 +170,6 @@ For recovery objectives and sovereignty controls, see the [AWS Reliability Pilla
 
 Did the architecture boundary and EKS/kind walkthrough answer your questions? Tell us what was clear and what needs another example.
 
-[Open the ARC401 session survey](https://production.awseventservices.com/events/Summit-Dubai-2026/tabs/more/evaluations?sessionId=ARC401), or scan the QR code:
+Scan this QR code with the AWS Events app to rate ARC401:
 
-![QR code for the ARC401 Dubai Summit session survey](https://walidshaari.github.io/sample-portable-app-reinvent/assets/arc401-session-survey.png)
+![QR code for the ARC401 session survey in the AWS Events app](https://walidshaari.github.io/sample-portable-app-reinvent/assets/arc401-session-survey.png)

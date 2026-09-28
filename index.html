@@ -32,10 +32,8 @@
     p{margin:0 0 18px}strong{color:var(--navy)}
     .lead{font-size:21px;line-height:1.52;color:#32445c}
     .ribbon{border-left:5px solid var(--orange);padding:17px 22px;background:var(--orange-pale);color:var(--navy);font-size:18px;margin:30px 0}
-    .survey-card{display:grid;grid-template-columns:minmax(0,1fr) 176px;gap:26px;align-items:center;background:var(--white);border:1px solid var(--line);border-top:5px solid var(--orange);padding:24px}
-    .survey-card img{display:block;width:176px;height:auto}
-    .survey-action{display:inline-block;background:var(--navy);color:#fff;padding:9px 16px;text-decoration:none;font-weight:700}
-    .survey-action:hover,.survey-action:focus{background:#304967;color:#fff}
+    .survey-card{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:26px;align-items:center;background:var(--white);border:1px solid var(--line);border-top:5px solid var(--orange);padding:24px}
+    .survey-card img{display:block;width:100%;max-width:260px;height:auto}
     .sourcebar{display:flex;justify-content:space-between;gap:15px;align-items:center;border:1px solid var(--line);background:var(--white);padding:13px 18px;margin:0 0 34px;font-size:14px}
     .sourcebar a{font-weight:700}
     .micro{font-size:13px;color:var(--muted)}
@@ -65,7 +63,7 @@
     .beat{font-size:12px;color:#98450d;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
     .end{border-top:3px solid var(--navy);padding-top:24px;margin-top:70px}
     footer{background:var(--navy);color:#dce4eb;padding:22px 38px;font-size:13px}footer div{max-width:1084px;margin:auto}footer a{color:#fff}
-    @media(max-width:780px){.mast-inner{padding:20px 22px 55px}.eyebrow{margin-top:75px}.layout{display:block;padding:0 22px}nav{display:none}article{padding-top:38px}.sourcebar{display:block}.sourcebar a{display:block;margin-top:4px}.compare,.proof,.filmstrip,.survey-card{grid-template-columns:1fr}.survey-card img{width:150px}.figure{padding:15px}.codehead{font-size:11px}}
+    @media(max-width:780px){.mast-inner{padding:20px 22px 55px}.eyebrow{margin-top:75px}.layout{display:block;padding:0 22px}nav{display:none}article{padding-top:38px}.sourcebar{display:block}.sourcebar a{display:block;margin-top:4px}.compare,.proof,.filmstrip,.survey-card{grid-template-columns:1fr}.figure{padding:15px}.codehead{font-size:11px}}
     @media print{body{background:#fff;font-size:12px}.mast{min-height:auto;-webkit-print-color-adjust:exact;print-color-adjust:exact}.mast-inner{padding:18px 25px 30px}.eyebrow{margin-top:24px}h1{font-size:45px}.layout{display:block;padding:0 25px}nav{display:none}article{padding:22px 0}.figure,.codebox,.compare,.proof{break-inside:avoid}section{margin-bottom:32px}footer{display:none}}
   </style>
 </head>
@@ -226,10 +224,9 @@ container digest matches the locally built image</code></pre></div>
   <div class="survey-card">
     <div>
       <p>Did the architecture boundary and EKS/kind walkthrough answer your questions? Tell us what was clear and what needs another example.</p>
-      <p><a class="survey-action" href="https://production.awseventservices.com/events/Summit-Dubai-2026/tabs/more/evaluations?sessionId=ARC401">Open the ARC401 session survey ↗</a></p>
-      <p class="micro">Scan the QR code if you are viewing this page on another device.</p>
+      <p><strong>Scan the QR code with the AWS Events app to rate ARC401.</strong></p>
     </div>
-    <a href="https://production.awseventservices.com/events/Summit-Dubai-2026/tabs/more/evaluations?sessionId=ARC401" aria-label="Open the ARC401 session survey"><img src="assets/arc401-session-survey.png" alt="QR code for the ARC401 Dubai Summit session survey" width="176" height="176"></a>
+    <img src="assets/arc401-session-survey.png" alt="QR code for the ARC401 session survey in the AWS Events app" width="260" height="260">
   </div>
 </section>
 </article></main>
