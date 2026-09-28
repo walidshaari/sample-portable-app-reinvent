@@ -1,0 +1,27 @@
+# In-Region target: Amazon EKS Auto Mode.
+#
+#   persistence.env    the persistence choice. Copy persistence.dynamodb.env
+#                      or persistence.postgres.env over it and re-apply; the
+#                      ConfigMap hash changes and the Deployment rolls.
+#   runtime.env        the runtime label.
+#   .generated/        written by codetalk_deployment/region/up.sh and
+#                      git-ignored: image digest, Region, database endpoint,
+#                      the External Secrets objects and the allowed client CIDR.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: portable-app
+resources:
+  - ../../base
+components:
+  - .generated
+configMapGenerator:
+  - name: app-config
+    envs:
+      - runtime.env
+      - persistence.env
+      - .generated/region.env
+patches:
+  - path: patches/arm64.yaml
+  - path: patches/service-nlb.yaml
+  - path: patches/db-credentials.yaml
+  - path: patches/db-credentials-job.yaml

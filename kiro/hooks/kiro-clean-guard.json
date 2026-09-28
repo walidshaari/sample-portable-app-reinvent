@@ -1,0 +1,37 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Block boundary violations before write",
+      "description": "Runs archguard on the proposed file content. Exit 2 blocks the write and returns the report to the agent.",
+      "trigger": "PreToolUse",
+      "matcher": "fs_write|str_replace|fs_append|write",
+      "timeout": 20,
+      "action": {
+        "type": "command",
+        "command": "python3 kiro/archguard/archguard.py hook --agent kiro"
+      }
+    },
+    {
+      "name": "Block commits that break boundaries",
+      "description": "For shell commands that run git commit, checks the staged content. Other commands are allowed.",
+      "trigger": "PreToolUse",
+      "matcher": "execute_bash|shell",
+      "timeout": 20,
+      "action": {
+        "type": "command",
+        "command": "python3 kiro/archguard/archguard.py hook --agent kiro"
+      }
+    },
+    {
+      "name": "Architecture check when the agent stops",
+      "description": "Informs only. Stop hooks cannot block; a non-zero exit shows stderr to the user, so the report is sent to stderr.",
+      "trigger": "Stop",
+      "timeout": 30,
+      "action": {
+        "type": "command",
+        "command": "python3 kiro/archguard/archguard.py check 1>&2"
+      }
+    }
+  ]
+}

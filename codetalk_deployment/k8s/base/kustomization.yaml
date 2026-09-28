@@ -1,0 +1,17 @@
+# Shared manifests for every Kubernetes target (EKS in a Region, kind on a
+# laptop or an on-premises cluster). Overlays change configuration, exposure
+# and where database credentials come from. They never change the image.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: portable-app
+labels:
+  - pairs:
+      app.kubernetes.io/name: portable-app
+      app.kubernetes.io/part-of: portable-app
+    includeSelectors: false
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - deployment.yaml
+  - service.yaml
+  - migrate-job.yaml

@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Block commits that break boundaries",
+      "trigger": "PreToolUse",
+      "description": "For agent shell commands that run git commit, checks the staged content with archguard and blocks on violations. Other commands pass.",
+      "matcher": "execute_bash|shell",
+      "timeout": 20,
+      "action": {
+        "type": "command",
+        "command": "python3 kiro/archguard/archguard.py hook --agent kiro"
+      }
+    }
+  ]
+}

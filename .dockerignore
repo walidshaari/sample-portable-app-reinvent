@@ -1,0 +1,11 @@
+.git
+.venv
+**/__pycache__
+**/.pytest_cache
+talk
+docs
+kiro
+demo
+src_python
+codetalk_deployment/**/.aws-sam
+**/.DS_Store

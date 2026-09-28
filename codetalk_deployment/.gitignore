@@ -1,0 +1,12 @@
+# Automatically generated image URI file
+.image_uri
+
+# Automatically generated EKS cluster name file
+.eks_cluster_name
+
+# Automatically generated DynamoDB table names / ARNs (dynamodb/create-tables.sh)
+.dynamodb_tables
+
+# Temporary files
+/tmp/
+*.tmp

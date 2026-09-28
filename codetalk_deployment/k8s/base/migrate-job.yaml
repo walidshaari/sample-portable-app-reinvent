@@ -1,0 +1,43 @@
+# Runs the selected backend's idempotent migration with the same image and
+# the same configuration as the app. For "memory" it is a no-op. The deploy
+# scripts delete and re-create it on every apply, because Job pod templates
+# are immutable.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: portable-app-migrate
+spec:
+  backoffLimit: 6
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app: portable-app-migrate
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: portable-app
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: migrate
+          image: portable-app
+          command: ["python3.11", "-m", "infrastructure.migrate"]
+          envFrom:
+            - configMapRef:
+                name: app-config
+          resources:
+            requests:
+              cpu: 50m
+              memory: 96Mi
+            limits:
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]

@@ -1,0 +1,50 @@
+# archguard.example.toml
+#
+# Annotated example that matches this repository (base_python/clean).
+# Copy it to archguard.toml at your repository root, or pass it with --config.
+# Every path in [project] is relative to THIS file. Layer paths and
+# composition_roots are relative to each source root.
+
+[project]
+# Directories whose contents are governed. Module names are resolved relative
+# to each root, so base_python/clean/domain/user.py is the module domain.user.
+source_roots = ["../../base_python/clean"]
+
+# One table per layer. A file belongs to the layer with the longest matching
+# path. Imports are default-deny: anything not in allow is an AG001 violation.
+# allow entries match by dotted prefix ("domain" permits "domain.user").
+[layers.domain]
+paths = ["domain"]
+allow = ["domain", "typing", "dataclasses", "re", "uuid", "datetime", "decimal", "enum", "abc", "__future__", "collections", "functools", "itertools", "math", "numbers", "string"]
+
+[layers.application]
+# application/ports and application/use_cases both live here.
+paths = ["application"]
+allow = ["domain", "application", "typing", "dataclasses", "re", "uuid", "datetime", "decimal", "enum", "abc", "__future__", "collections", "functools", "itertools", "math", "numbers", "string"]
+
+[layers.infrastructure]
+# Adapters, HTTP apps, Lambda handlers. Any import is allowed here, but AG002
+# and AG003 still apply outside the composition roots.
+paths = ["infrastructure"]
+allow = ["*"]
+
+[rules]
+# The only files allowed to read configuration (AG002) and to import concrete
+# adapters (AG003).
+composition_roots = ["infrastructure/composition.py", "infrastructure/config.py"]
+# Packages that hold concrete adapters. Only composition roots and modules
+# inside these packages may import them.
+adapter_packages = ["infrastructure.repositories"]
+# Importing any of these counts as a configuration read (AG002).
+config_read_modules = ["dotenv", "decouple", "environs"]
+
+# Limits for the cleanliness score (archguard score). Optional; these are the
+# defaults. Functions above a limit are reported as AGQ101-AGQ103 warnings.
+# They never block a write or a commit.
+[quality]
+max_complexity = 10       # cyclomatic complexity per function
+max_function_lines = 50   # def line to last line, docstring included
+max_parameters = 5        # self and cls are not counted
+
+# Not governed by any rule: files outside source_roots, non-.py files, and
+# test files (a tests/ directory segment, test_*.py, conftest.py).

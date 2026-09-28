@@ -1,0 +1,23 @@
+# Run on the Graviton node pool (codetalk_deployment/region/nodepool-arm64.yaml)
+# so the Region and the arm64 laptop run the same single-platform image digest.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portable-app
+spec:
+  template:
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
+        karpenter.sh/nodepool: portable-app-arm64
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: portable-app-migrate
+spec:
+  template:
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
+        karpenter.sh/nodepool: portable-app-arm64

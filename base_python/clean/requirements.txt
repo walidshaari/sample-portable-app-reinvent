@@ -1,0 +1,6 @@
+fastapi==0.141.1
+jinja2==3.1.6
+uvicorn==0.53.0
+boto3==1.43.98
+psycopg[binary]==3.3.6
+psycopg-pool==3.3.3

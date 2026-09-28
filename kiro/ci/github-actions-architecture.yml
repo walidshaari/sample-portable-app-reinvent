@@ -1,0 +1,32 @@
+# Example GitHub Actions workflow: archguard as a required status check.
+# Copy to .github/workflows/architecture.yml and mark the "archguard" job as
+# required in branch protection. This is the boundary for humans and for shell
+# writes that bypass agent hooks.
+#
+# Pin third-party actions to a full commit SHA in production; the tags below are
+# placeholders to replace with SHAs you have reviewed.
+name: architecture
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  archguard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4  # replace with a pinned commit SHA
+      - uses: actions/setup-python@v5  # replace with a pinned commit SHA
+        with:
+          python-version: "3.12"
+      - name: Boundary check
+        run: python3 tools/archguard/archguard.py check
+      - name: Architecture report
+        if: always()
+        run: |
+          python3 tools/archguard/archguard.py scan . --format md >> "$GITHUB_STEP_SUMMARY"

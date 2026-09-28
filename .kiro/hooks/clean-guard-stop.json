@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Architecture check when the agent stops",
+      "trigger": "Stop",
+      "description": "Informs only: runs archguard check over the governed tree when the agent finishes and shows the report.",
+      "timeout": 30,
+      "action": {
+        "type": "command",
+        "command": "python3 kiro/archguard/archguard.py check 1>&2"
+      }
+    }
+  ]
+}

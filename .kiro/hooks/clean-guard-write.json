@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Block boundary violations before write",
+      "trigger": "PreToolUse",
+      "description": "Runs archguard on the proposed file content of agent writes. Exit 2 blocks the write and returns the report to the agent.",
+      "matcher": "fs_write|str_replace|fs_append|write",
+      "timeout": 20,
+      "action": {
+        "type": "command",
+        "command": "python3 kiro/archguard/archguard.py hook --agent kiro"
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "description": "archguard boundary checks. Codex skips new or changed hooks until you trust them with /hooks.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "apply_patch|Edit|Write|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/kiro/archguard/archguard.py\" hook --agent codex",
+            "statusMessage": "Checking architecture boundaries",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
+}

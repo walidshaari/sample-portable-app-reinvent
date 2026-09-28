@@ -1,0 +1,12 @@
+# kind maps node port 30080 to localhost:8080 (see local/kind-config.yaml).
+apiVersion: v1
+kind: Service
+metadata:
+  name: portable-app
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      nodePort: 30080

@@ -1,0 +1,25 @@
+# archguard configuration for this repository. See kiro/archguard/archguard.example.toml
+# for every option. Paths in [project] are relative to this file; layer paths
+# and composition_roots are relative to each source root.
+
+[project]
+# The deployed clean-architecture app. src_python/ is historical reference and
+# base_python/monolith is the intentional "before" example, so neither is governed.
+source_roots = ["base_python/clean"]
+
+[layers.domain]
+paths = ["domain"]
+allow = ["domain", "typing", "dataclasses", "re", "uuid", "datetime", "decimal", "enum", "abc", "__future__", "collections", "functools", "itertools", "math", "numbers", "string"]
+
+[layers.application]
+paths = ["application"]
+allow = ["domain", "application", "typing", "dataclasses", "re", "uuid", "datetime", "decimal", "enum", "abc", "__future__", "collections", "functools", "itertools", "math", "numbers", "string"]
+
+[layers.infrastructure]
+paths = ["infrastructure"]
+allow = ["*"]
+
+[rules]
+composition_roots = ["infrastructure/composition.py", "infrastructure/config.py"]
+adapter_packages = ["infrastructure.repositories"]
+config_read_modules = ["dotenv", "decouple", "environs"]

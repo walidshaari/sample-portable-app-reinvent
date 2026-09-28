@@ -1,0 +1,30 @@
+# PostgreSQL 18.6 managed by the CloudNativePG operator (1.30.1).
+#
+# Laptop topology is reduced on purpose: 2 instances (one primary, one
+# streaming standby) on one kind node, 1 GiB volumes, no object-store backup.
+# The production topology for the same manifest is 3 instances spread across
+# 3 nodes or failure domains, dedicated storage, and continuous backup to an
+# object store (Barman Cloud plugin). See https://cloudnative-pg.io/docs/1.30/architecture
+#
+# CloudNativePG creates the Secret "pg-app" (username, password, host,
+# port, dbname, uri) and the Services pg-rw (primary), pg-ro, pg-r.
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: pg
+spec:
+  instances: 2
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.6-standard-trixie@sha256:58d19a1edb30d42fc2be3470ac7719caa496a4f3a7f1289472d6c3f6b04c8fd1
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 1Gi
+  bootstrap:
+    initdb:
+      database: app
+      owner: app
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 512Mi

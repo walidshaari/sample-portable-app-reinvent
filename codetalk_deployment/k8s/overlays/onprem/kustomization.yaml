@@ -1,0 +1,33 @@
+# On-premises target, rehearsed on a laptop with kind.
+#
+#   persistence.env    the persistence choice. Copy one of:
+#                        persistence.postgres.env        PostgreSQL run by
+#                                                        CloudNativePG (production-grade
+#                                                        engine and operator)
+#                        persistence.dynamodb-local.env  DynamoDB Local
+#                                                        (development and testing only)
+#                      over it and re-apply.
+#   runtime.env        the runtime label.
+#   .generated/        written by codetalk_deployment/local/up.sh and
+#                      git-ignored: the image digest in the local registry.
+#
+# No cloud identity, no cloud endpoint, and an egress policy that keeps the
+# app inside the cluster.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: portable-app
+resources:
+  - ../../base
+  - postgres-cluster.yaml
+  - network-policy.yaml
+components:
+  - .generated
+configMapGenerator:
+  - name: app-config
+    envs:
+      - runtime.env
+      - persistence.env
+patches:
+  - path: patches/service-nodeport.yaml
+  - path: patches/db-credentials.yaml
+  - path: patches/db-credentials-job.yaml

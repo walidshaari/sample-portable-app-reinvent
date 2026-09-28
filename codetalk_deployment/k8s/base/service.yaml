@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: portable-app
+spec:
+  selector:
+    app: portable-app
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+  type: ClusterIP

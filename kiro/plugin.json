@@ -1,0 +1,23 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "clean-architecture-guard",
+  "version": "0.1.0",
+  "description": "Enforce clean architecture in Python code: block boundary-violating writes and commits with archguard hooks, review brownfield code with a six-move refactor plan, and scaffold new clean services.",
+  "author": {
+    "name": "Sample maintainers"
+  },
+  "keywords": [
+    "clean architecture",
+    "hexagonal",
+    "ports and adapters",
+    "architecture",
+    "boundary",
+    "layering",
+    "dependency rule",
+    "composition root",
+    "refactor monolith",
+    "archguard",
+    "python"
+  ],
+  "license": "MIT-0"
+}

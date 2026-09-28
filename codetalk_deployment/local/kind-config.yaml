@@ -1,0 +1,16 @@
+# kind cluster that stands in for an on-premises Kubernetes cluster.
+# Node image pinned to Kubernetes 1.36, the same minor as the EKS cluster.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: portable-onprem
+nodes:
+  - role: control-plane
+    image: kindest/node:v1.36.4@sha256:099e049362a1526b2db71494e1947aae99bd16290d7c895f2b7ea312e3cbfaed
+    extraPortMappings:
+      - containerPort: 30080
+        hostPort: 8080
+        listenAddress: "127.0.0.1"
+        protocol: TCP
+# Current kind node images read registry hosts from /etc/containerd/certs.d.
+# local/up.sh writes a hosts.toml there so localhost:5001/* resolves to the
+# local registry container, the on-premises stand-in for a private registry.

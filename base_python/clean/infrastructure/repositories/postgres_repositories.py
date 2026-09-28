@@ -1,0 +1,223 @@
+"""
+PostgreSQL adapters for the UserRepository and OrderRepository ports.
+
+This file is the technology axis in one place: a relational store behind the
+same two ports the in-memory and DynamoDB adapters implement. The domain, the
+use cases and the ports do not change. The composition root gains one
+registry line.
+
+The same file, byte for byte, serves every PostgreSQL deployment. Which one is
+a configuration choice:
+  - Amazon Aurora PostgreSQL (in a Region)
+  - PostgreSQL run by the CloudNativePG operator (on-premises Kubernetes)
+  - a PostgreSQL container on a laptop (tests)
+
+Options (read by the composition root and passed in as a mapping):
+  POSTGRES_DSN              libpq connection string or URI. If unset, the
+                            parts below are used instead.
+  POSTGRES_HOST, POSTGRES_PORT (5432), POSTGRES_DB, POSTGRES_USER,
+  POSTGRES_PASSWORD, POSTGRES_SSLMODE (prefer)
+  POSTGRES_POOL_MIN (1), POSTGRES_POOL_MAX (5)
+  POSTGRES_CONNECT_TIMEOUT  seconds, default 3
+  POSTGRES_POOL_TIMEOUT     seconds to wait for a pooled connection, default 5
+
+Data-model translation this adapter owns (the port hides it):
+  - Rows and typed columns instead of schemaless items. quantity is INTEGER,
+    so the Decimal-to-int conversion the DynamoDB adapter needs disappears.
+  - create() is an upsert (INSERT ... ON CONFLICT DO UPDATE) to keep the
+    port's overwrite semantics, which DynamoDB PutItem has natively.
+  - delete() is one atomic DELETE ... RETURNING instead of read-then-delete.
+  - find_all() orders by id; the port promises no order, the SQL makes the
+    result deterministic.
+  - No foreign key from orders.user_id to users.id: the domain accepts an
+    order for an unknown user, and the adapter must not add a business rule
+    the other adapters do not enforce. Validation stays in the entities.
+
+The pool is synchronous (psycopg_pool.ConnectionPool) and calls run in a
+worker thread with asyncio.to_thread, like the DynamoDB adapter. That keeps
+the adapter independent of which event loop the HTTP edge runs (uvicorn,
+Mangum on Lambda, or a test client).
+"""
+import asyncio
+from typing import Any, List, Mapping, Optional
+
+from application.ports.order_repository import OrderRepository
+from application.ports.user_repository import UserRepository
+from domain.order import Order
+from domain.user import User
+from infrastructure.repositories.bundle import BackendConfigurationError, RepositoryBundle
+
+SCHEMA = """
+CREATE TABLE IF NOT EXISTS users (
+    id    TEXT PRIMARY KEY,
+    name  TEXT NOT NULL,
+    email TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS orders (
+    id       TEXT PRIMARY KEY,
+    user_id  TEXT NOT NULL,
+    product  TEXT NOT NULL,
+    quantity INTEGER NOT NULL,
+    status   TEXT NOT NULL
+);
+"""
+
+
+class PostgresUserRepository(UserRepository):
+    """PostgreSQL-backed UserRepository"""
+
+    def __init__(self, pool: Any):
+        self._pool = pool
+
+    def _execute(self, sql: str, params: tuple = (), fetch: str = "none"):
+        with self._pool.connection() as conn:
+            cur = conn.execute(sql, params)
+            if fetch == "one":
+                return cur.fetchone()
+            if fetch == "all":
+                return cur.fetchall()
+            return None
+
+    async def create(self, user: User) -> None:
+        await asyncio.to_thread(
+            self._execute,
+            "INSERT INTO users (id, name, email) VALUES (%s, %s, %s) "
+            "ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, email = EXCLUDED.email",
+            (user.id, user.name, user.email),
+        )
+
+    async def find_by_id(self, id: str) -> Optional[User]:
+        row = await asyncio.to_thread(
+            self._execute, "SELECT id, name, email FROM users WHERE id = %s", (id,), "one"
+        )
+        return User(*row) if row else None
+
+    async def find_all(self) -> List[User]:
+        rows = await asyncio.to_thread(
+            self._execute, "SELECT id, name, email FROM users ORDER BY id", (), "all"
+        )
+        return [User(*row) for row in rows]
+
+    async def delete(self, id: str) -> None:
+        row = await asyncio.to_thread(
+            self._execute, "DELETE FROM users WHERE id = %s RETURNING id", (id,), "one"
+        )
+        if row is None:
+            raise ValueError("User not found")
+
+
+class PostgresOrderRepository(OrderRepository):
+    """PostgreSQL-backed OrderRepository"""
+
+    _COLUMNS = "id, user_id, product, quantity, status"
+
+    def __init__(self, pool: Any):
+        self._pool = pool
+
+    def _execute(self, sql: str, params: tuple = (), fetch: str = "none"):
+        with self._pool.connection() as conn:
+            cur = conn.execute(sql, params)
+            if fetch == "one":
+                return cur.fetchone()
+            if fetch == "all":
+                return cur.fetchall()
+            return None
+
+    async def create(self, order: Order) -> None:
+        await asyncio.to_thread(
+            self._execute,
+            f"INSERT INTO orders ({self._COLUMNS}) VALUES (%s, %s, %s, %s, %s) "
+            "ON CONFLICT (id) DO UPDATE SET user_id = EXCLUDED.user_id, "
+            "product = EXCLUDED.product, quantity = EXCLUDED.quantity, status = EXCLUDED.status",
+            (order.id, order.user_id, order.product, order.quantity, order.status),
+        )
+
+    async def find_by_id(self, id: str) -> Optional[Order]:
+        row = await asyncio.to_thread(
+            self._execute, f"SELECT {self._COLUMNS} FROM orders WHERE id = %s", (id,), "one"
+        )
+        return Order(*row) if row else None
+
+    async def find_all(self) -> List[Order]:
+        rows = await asyncio.to_thread(
+            self._execute, f"SELECT {self._COLUMNS} FROM orders ORDER BY id", (), "all"
+        )
+        return [Order(*row) for row in rows]
+
+    async def delete(self, id: str) -> None:
+        row = await asyncio.to_thread(
+            self._execute, "DELETE FROM orders WHERE id = %s RETURNING id", (id,), "one"
+        )
+        if row is None:
+            raise ValueError("Order not found")
+
+
+def conninfo_from(options: Mapping[str, str]) -> str:
+    """Build a libpq connection string from POSTGRES_* options"""
+    from psycopg.conninfo import make_conninfo
+
+    def get(name: str, default: str = "") -> str:
+        return str(options.get(name, default)).strip()
+
+    timeout = get("POSTGRES_CONNECT_TIMEOUT", "3") or "3"
+    dsn = get("POSTGRES_DSN")
+    if dsn:
+        return make_conninfo(dsn, connect_timeout=timeout)
+    missing = [n for n in ("POSTGRES_HOST", "POSTGRES_DB", "POSTGRES_USER") if not get(n)]
+    if missing:
+        raise BackendConfigurationError(
+            "REPOSITORY_BACKEND=postgres requires POSTGRES_DSN or " + " and ".join(missing)
+        )
+    return make_conninfo(
+        host=get("POSTGRES_HOST"),
+        port=get("POSTGRES_PORT", "5432") or "5432",
+        dbname=get("POSTGRES_DB"),
+        user=get("POSTGRES_USER"),
+        password=get("POSTGRES_PASSWORD") or None,
+        sslmode=get("POSTGRES_SSLMODE", "prefer") or "prefer",
+        connect_timeout=timeout,
+        application_name="portable-app",
+    )
+
+
+def build(options: Mapping[str, str]) -> RepositoryBundle:
+    """Backend entry used by the composition root registry"""
+    import psycopg
+    from psycopg_pool import ConnectionPool, PoolTimeout
+
+    conninfo = conninfo_from(options)
+    pool = ConnectionPool(
+        conninfo,
+        min_size=int(options.get("POSTGRES_POOL_MIN", "1") or 1),
+        max_size=int(options.get("POSTGRES_POOL_MAX", "5") or 5),
+        timeout=float(options.get("POSTGRES_POOL_TIMEOUT", "5") or 5),
+        # Validate a connection before handing it out, so a failover (the
+        # primary moved) costs one reconnect, not a burst of errors.
+        check=ConnectionPool.check_connection,
+        kwargs={"autocommit": True},
+        open=False,
+        name="portable-app",
+    )
+    # Non-blocking open: the process starts even if the database is down.
+    pool.open(wait=False)
+
+    def ping_sync() -> None:
+        with pool.connection() as conn:
+            conn.execute("SELECT 1")
+
+    async def ping() -> None:
+        await asyncio.to_thread(ping_sync)
+
+    def migrate() -> None:
+        with pool.connection() as conn:
+            conn.execute(SCHEMA)
+
+    return RepositoryBundle(
+        users=PostgresUserRepository(pool),
+        orders=PostgresOrderRepository(pool),
+        unavailable_errors=(psycopg.OperationalError, PoolTimeout),
+        ping=ping,
+        migrate=migrate,
+        close=pool.close,
+        describe={"store": "postgresql"},
+    )

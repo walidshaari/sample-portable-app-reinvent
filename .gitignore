@@ -1,0 +1,32 @@
+.DS_Store
+.vscode/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+coverage/
+node_modules/
+dist/
+
+# Local image and deployment state
+.image_uri
+codetalk_deployment/.image_uri
+codetalk_deployment/.image_digest
+codetalk_deployment/.build/
+codetalk_deployment/.region_state
+codetalk_deployment/.local_state
+codetalk_deployment/.eks_cluster_name
+codetalk_deployment/.dynamodb_tables
+codetalk_deployment/k8s/overlays/*/.generated/
+codetalk_deployment/**/.aws-sam/
+
+# Session assets belong outside the public project
+talk/
+docs/
+*.wav
+*.m4a
+*.mp4
+*.mov

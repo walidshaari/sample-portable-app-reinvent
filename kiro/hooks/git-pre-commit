@@ -1,0 +1,29 @@
+#!/bin/sh
+# archguard pre-commit hook: checks the staged content of .py files.
+# Install: copy to .githooks/pre-commit, chmod +x, then run
+#   git config core.hooksPath .githooks
+# Exit status: 0 allows the commit, non-zero stops it.
+set -eu
+
+ARCHGUARD="kiro/archguard/archguard.py"
+TOP=$(git rev-parse --show-toplevel)
+cd "$TOP"
+
+if ! command -v python3 >/dev/null 2>&1; then
+    echo "archguard pre-commit: python3 not found; commit refused." >&2
+    exit 1
+fi
+if [ ! -f "$ARCHGUARD" ]; then
+    echo "archguard pre-commit: $ARCHGUARD not found; commit refused." >&2
+    exit 1
+fi
+
+set +e
+python3 "$ARCHGUARD" staged
+status=$?
+set -e
+if [ "$status" -eq 0 ]; then
+    exit 0
+fi
+echo "archguard pre-commit: commit refused (exit $status). Fix the findings above and stage again." >&2
+exit 1
