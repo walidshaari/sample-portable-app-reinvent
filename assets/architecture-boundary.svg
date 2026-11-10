@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" role="img" aria-labelledby="boundary-title boundary-desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 330" role="img" aria-labelledby="boundary-title boundary-desc">
 <style>
 text { font-family: Arial, sans-serif; fill: #14243a; }
 .small { font-size: 13px; fill: #536277; }
@@ -7,12 +7,14 @@ text { font-family: Arial, sans-serif; fill: #14243a; }
 .accent { fill: #fff0e2; stroke: #e36d12; stroke-width: 2; }
 .zone { fill: #f1f4f6; stroke: #aab5c2; stroke-width: 1.5; }
 .edge { stroke: #40526a; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+.dep { stroke: #e36d12; stroke-width: 2; stroke-dasharray: 6 4; fill: none; marker-end: url(#arrowdep); }
+.deptext { font-size: 12px; fill: #b4530a; }
 </style>
 <rect width="100%" height="100%" fill="#faf8f3"/>
 
       <title id="boundary-title">Request flow and code dependency across the clean architecture boundary</title>
-      <desc id="boundary-desc">A request travels from HTTP to use case, then through a repository port to an adapter and store. The use case and port form the core. The composition root selects the adapter.</desc>
-      <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#40526a"/></marker></defs>
+      <desc id="boundary-desc">A request travels from HTTP to use case, then through a repository port to an adapter and store. The use case and port form the core. Solid arrows show the runtime request path. Dashed arrows show source-code dependencies: the use case depends on the port, and the adapter also depends on the port, so the core never imports the adapter. The composition root selects the adapter.</desc>
+      <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#40526a"/></marker><marker id="arrowdep" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#e36d12"/></marker></defs>
       <rect x="195" y="43" width="422" height="180" rx="14" class="zone"/>
       <text x="215" y="68" class="small">CORE · domain + application</text>
       <rect x="15" y="95" width="150" height="92" rx="10" class="node"/><text x="90" y="137" text-anchor="middle" class="label">HTTP</text><text x="90" y="159" text-anchor="middle" class="small">request edge</text>
@@ -21,5 +23,9 @@ text { font-family: Arial, sans-serif; fill: #14243a; }
       <rect x="635" y="95" width="150" height="92" rx="10" class="node"/><text x="710" y="137" text-anchor="middle" class="label">Adapter</text><text x="710" y="159" text-anchor="middle" class="small">DynamoDB / SQL</text>
       <rect x="825" y="95" width="150" height="92" rx="10" class="node"/><text x="900" y="137" text-anchor="middle" class="label">Store</text>
       <path d="M166 141 H217" class="edge"/><path d="M396 141 H427" class="edge"/><path d="M586 141 H627" class="edge"/><path d="M786 141 H817" class="edge"/>
-      <text x="500" y="255" text-anchor="middle" class="small">At startup, composition chooses which adapter fulfills the port.</text>
+      <path d="M310 188 V210 H492 V196" class="dep"/><text x="400" y="204" text-anchor="middle" class="deptext">depends on</text>
+      <path d="M710 188 V210 H528 V196" class="dep"/><text x="660" y="204" text-anchor="middle" class="deptext">implements</text>
+      <path d="M300 262 H340" class="edge"/><text x="348" y="266" class="small">request flow at runtime</text>
+      <path d="M560 262 H600" class="dep"/><text x="608" y="266" class="small">source-code dependency</text>
+      <text x="500" y="305" text-anchor="middle" class="small">At startup, composition chooses which adapter fulfills the port.</text>
     </svg>

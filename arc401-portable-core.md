@@ -34,9 +34,9 @@ A use case holds the business action, and a port names the behavior it needs. An
 
 Follow the arrows in the diagram: which part owns the database choice?
 
-![Request flow through HTTP, use case, repository port, adapter, and store](https://walidshaari.github.io/sample-portable-app-reinvent/assets/architecture-boundary.png)
+![Request flow through HTTP, use case, repository port, adapter, and store. Dashed arrows show that the use case and adapter both depend on the port](https://walidshaari.github.io/sample-portable-app-reinvent/assets/architecture-boundary.png)
 
-Follow the request from HTTP to the use case, port, adapter, and store. The use case and port form the core. Both the use case and database adapter depend on the port's contract.
+The solid arrows follow a request from HTTP to the use case, port, adapter, and store. The dashed arrows show code dependencies: the use case and the database adapter both depend on the port's contract, so nothing in the core imports the adapter.
 
 `base_python/clean/application/use_cases/create_user.py` (lines 7-22, docstrings omitted):
 
@@ -60,7 +60,7 @@ The entity checks input types before using string operations. A missing email or
 
 ## One image. Two deployments. Separate data.
 
-The terminal walkthrough replays the read-only [`demo/09-two-targets.sh`](https://github.com/walidshaari/sample-portable-app-reinvent/blob/b9ef30a2e7d73311f12a6e3e2360c1a21f9214c8/demo/09-two-targets.sh) audit. It checks runtime labels, store readiness, a core fingerprint matching the checkout, and pod digests matching each other and the locally built image. It stops on a mismatch. The 28 September 2026 recording documents the rehearsal build. The public package needs a new digest proof.
+The terminal walkthrough replays the read-only [`demo/09-two-targets.sh`](https://github.com/walidshaari/sample-portable-app-reinvent/blob/b9ef30a2e7d73311f12a6e3e2360c1a21f9214c8/demo/09-two-targets.sh) audit. It checks runtime labels, store readiness, a core fingerprint matching the checkout, and pod digests matching each other and the locally built image. It stops if a label, fingerprint, or digest does not match. It prints each target's repository backend and store but does not assert them, so read those two values in the output yourself. The 28 September 2026 recording documents the rehearsal build. The public package needs a new digest proof.
 
 *Running pod image IDs in the 28 September 2026 rehearsal capture:*
 
@@ -105,7 +105,9 @@ BACKENDS: Dict[str, str] = {
 }
 ```
 
-The prepared `demo/04-tech-axis.sh` replays the adapter addition and runs the same repository contract against each implementation. On stage, call it a patch replay. It is not a spontaneous database migration.
+The prepared `demo/04-tech-axis.sh` replays the adapter addition and runs the same repository contract against each implementation. It is a prepared patch replay, not a spontaneous database migration.
+
+The contract tests run the DynamoDB adapter against Moto, an in-process DynamoDB mock, and the PostgreSQL adapter against a real PostgreSQL server. The replay requires a PostgreSQL server and does not let those cases skip. They are meaningful adapter tests, not live DynamoDB tests.
 
 The sample migration job creates tables with `CREATE TABLE IF NOT EXISTS`. It does not version schema changes or move records between databases. A real cutover needs a backfill, verification, a write strategy, and rollback steps.
 
@@ -130,11 +132,23 @@ The on-stage command replays a Kiro tool payload locally. Hook coverage depends 
 
 kind runs on one laptop node. Its two PostgreSQL instances do not establish site-level recovery. It is an on-premises stand-in that shows the application running locally with the tested dependencies and network setup.
 
-## Rehearse what each screen proves
+## Walk your team through it
 
-The ARC401 session is 40 minutes: 10 minutes for the change tax, core boundary, and two change axes; 25 minutes for the request path and demos; and five minutes for questions. In the demo, show the EKS/kind proof, change Region persistence, replay the adapter addition, and reject the agent shortcut. Keep the two-target proof, adapter contract, and guard rejection if time runs short.
+You don't need a conference slot to use this material. The same sequence works for a design review, a brown-bag session, or onboarding a team that is about to adopt a coding assistant.
 
-Ask a colleague to explain the deployment diagram without narration. If they infer automatic failover or compliant residency, revise the line you used. The rehearsal works when they can say what stayed fixed, what changed, and what remains unproved.
+**A 40-minute outline.** The ARC401 session used this split:
+
+**10 minutes: the argument.** Show the change tax in the starting app, the core boundary, and the two change axes: placement and technology.
+
+**25 minutes: the evidence.** Trace one request through the use case, port, and adapter. Show the EKS/kind digest check. Change the store by configuration. Replay the adapter addition against the shared contract. Show the hook rejecting the `boto3` import.
+
+**5 minutes: questions.**
+
+With only 15 minutes, keep three proofs: the two-target digest check, the adapter contract, and the guard rejection. Each answers a different question. Did the app move unchanged? Can the storage technology change without touching the core? Can an assistant be stopped before it crosses the boundary?
+
+**Test your wording first.** Ask a colleague to explain the two-placement diagram without your narration. If they say "automatic failover" or "compliant residency," the diagram or your line promises more than the evidence shows. Revise it. You are ready when they can name what stayed fixed, what changed, and what remains unproved.
+
+**Start on your own codebase.** Pick one business action that must survive a change of storage, entry point, or team. Name the behavior it needs as a port. Move the SDK call into an adapter. Connect it in a composition root. Run the same contract test against the old and new implementations. Then decide whether the next action is worth the same treatment.
 
 The short replays trace the request, pair the Region and laptop digest checks, distinguish the two change axes, and show the guard rejection. In the first terminal walkthrough, the EKS and kind results appear in one view. Their digest rows sit together before the recording moves to the separate store settings.
 
